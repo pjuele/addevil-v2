@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADDevil - ADHD Todo System Wireframes</title>
+    <style>
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #09090b;
+            color: #E5E5E5;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .wireframe {
+            background: #181818;
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .wireframe h2 {
+            color: #E5E5E5;
+            padding-bottom: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+        
+        /* Main Dashboard Layout */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            height: 400px;
+        }
+        
+        .list-column {
+            border: 1px solid #252525;
+            border-radius: 6px;
+            padding: 16px;
+            background: #181818;
+        }
+        
+        .long-list { background: #181818; border-color: #252525; }
+        .focus-list { background: #181818; border-color: #252525; }
+        .routine-list { background: #181818; border-color: #252525; }
+        
+        .list-header {
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+        }
+        
+        .long-list .list-header { background: #252525; color: #E5E5E5; }
+        .focus-list .list-header { background: #252525; color: #E5E5E5; }
+        .routine-list .list-header { background: #252525; color: #E5E5E5; }
+        
+        .task-item {
+            background: #252525;
+            border: 1px solid #252525;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 0.875rem;
+            cursor: pointer;
+            color: #E5E5E5;
+            transition: all 0.15s ease;
+        }
+        
+        .task-item:hover {
+            background: #404040;
+            border-color: #404040;
+        }
+        
+        .priority-now { border-left: 2px solid #ef4444; }
+        .priority-later { border-left: 2px solid #eab308; }
+        .priority-parking { border-left: 2px solid #6b7280; }
+        
+        /* Focus Mode Layout */
+        .focus-mode {
+            text-align: center;
+            padding: 48px;
+            background: url('focus.jpg') center/cover no-repeat;
+            color: hsl(210 20% 98%);
+            border-radius: 12px;
+            position: relative;
+            border: 1px solid hsl(217.2 32.6% 17.5%);
+        }
+        
+        .focus-mode::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            z-index: 1;
+        }
+        
+        .focus-mode > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .current-task {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .timer {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 24px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .energy-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin: 24px 0;
+            overflow: hidden;
+        }
+        
+        .energy-fill {
+            height: 100%;
+            background: hsl(142.1 76.2% 36.3%);
+            border-radius: 4px;
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+        
+        .focus-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-done { 
+            background: hsl(142.1 76.2% 36.3%); 
+            color: hsl(210 20% 98%);
+        }
+        .btn-done:hover {
+            background: hsl(142.1 76.2% 32%);
+        }
+        .btn-break { 
+            background: hsl(48 96% 53%); 
+            color: hsl(224 71.4% 4.1%);
+        }
+        .btn-break:hover {
+            background: hsl(48 96% 48%);
+        }
+        .btn-switch { 
+            background: hsl(0 84.2% 60.2%); 
+            color: hsl(210 20% 98%);
+        }
+        .btn-switch:hover {
+            background: hsl(0 84.2% 55%);
+        }
+        
+        /* Task Detail View */
+        .task-detail {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .task-info {
+            padding: 24px;
+            background: #181818;
+            border-radius: 8px;
+            border: 1px solid #252525;
+        }
+        
+        .task-meta {
+            padding: 24px;
+            background: #181818;
+            border-radius: 8px;
+            border: 1px solid #252525;
+        }
+        
+        .meta-item {
+            margin: 12px 0;
+            padding: 12px;
+            background: #252525;
+            border-radius: 6px;
+            border: 1px solid #252525;
+        }
+        
+        .breakdown-steps {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .breakdown-steps li {
+            padding: 12px;
+            margin: 8px 0;
+            background: #252525;
+            border-radius: 6px;
+            border: 1px solid #252525;
+            border-left: 2px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <h1>ADDevil - ADHD Todo System Wireframes</h1>
+    
+    <!-- Main Dashboard -->
+    <div class="wireframe">
+        <h2>📊 Main Dashboard - Three-List System</h2>
+        <div class="dashboard-layout">
+            <div class="list-column long-list">
+                <div class="list-header">🗂️ Long List (Everything)</div>
+                <div class="task-item priority-now">Fix login bug</div>
+                <div class="task-item priority-later">Learn TypeScript</div>
+                <div class="task-item priority-parking">Reorganize photos</div>
+                <div class="task-item priority-now">Call dentist</div>
+                <div class="task-item priority-later">Read React docs</div>
+                <div class="task-item priority-parking">Plan vacation</div>
+            </div>
+            
+            <div class="list-column focus-list">
+                <div class="list-header">🎯 Today's Focus (Max 3)</div>
+                <div class="task-item priority-now">🔥 Fix login bug (2h)</div>
+                <div class="task-item priority-later">Call dentist (15min)</div>
+                <div style="text-align: center; margin-top: 20px; color: #666;">
+                    <em>Drag from Long List →</em>
+                </div>
+            </div>
+            
+            <div class="list-column routine-list">
+                <div class="list-header">⏰ Routines & Habits</div>
+                <div class="task-item">☀️ Morning coffee + emails</div>
+                <div class="task-item">🍽️ Plan dinner by 3pm</div>
+                <div class="task-item">🧘 Evening wind-down</div>
+                <div class="task-item">📱 Check messages after lunch</div>
+            </div>
+        </div>
+        <p><strong>Key Concept:</strong> The Long List captures everything to prevent forgetting. Focus List is limited to prevent overwhelm. Routines are context-triggered.</p>
+    </div>
+    
+    <!-- Focus Mode -->
+    <div class="wireframe">
+        <h2>🎯 Focus Mode - Single Task Interface</h2>
+        <div class="focus-mode">
+            <div class="current-task">Fix login bug - authentication redirect issue</div>
+            <div class="timer">1:23:45</div>
+            <div>Energy Level</div>
+            <div class="energy-bar">
+                <div class="energy-fill"></div>
+            </div>
+            <div class="focus-actions">
+                <button class="btn btn-done">✅ Done</button>
+                <button class="btn btn-break">☕ Break</button>
+                <button class="btn btn-switch">🔄 Switch Task</button>
+            </div>
+        </div>
+        <p><strong>Key Concept:</strong> Full-screen focus on ONE task. Timer tracks actual vs estimated time. Energy bar prevents burnout. Switch Task requires confirmation (ADHD reality).</p>
+    </div>
+    
+    <!-- Task Detail -->
+    <div class="wireframe">
+        <h2>📋 Task Detail - ADHD-Specific Metadata</h2>
+        <div class="task-detail">
+            <div class="task-info">
+                <h3>Fix login bug - authentication redirect issue</h3>
+                <p><strong>Description:</strong> Users getting stuck on redirect after login. Seems to be session-related.</p>
+                <h4>Breakdown Steps:</h4>
+                <ul class="breakdown-steps">
+                    <li>✅ Reproduce the bug locally</li>
+                    <li>🔄 Check session cookie configuration</li>
+                    <li>⏳ Test different redirect URLs</li>
+                    <li>⏳ Implement fix and test</li>
+                </ul>
+                <p><strong>Dopamine Reward:</strong> Deploy fix and see user complaints stop! 🎉</p>
+            </div>
+            
+            <div class="task-meta">
+                <h4>ADHD Metadata</h4>
+                <div class="meta-item">
+                    <strong>Time Estimate:</strong> 2 hours<br>
+                    <em>Previous similar: 3.5hrs</em>
+                </div>
+                <div class="meta-item">
+                    <strong>Energy Level:</strong> High<br>
+                    <strong>Complexity:</strong> Medium
+                </div>
+                <div class="meta-item">
+                    <strong>Context:</strong> @computer<br>
+                    <strong>Best Time:</strong> Morning
+                </div>
+                <div class="meta-item">
+                    <strong>⚠️ Hyperfocus Risk:</strong> Yes<br>
+                    <em>Set 90min timer!</em>
+                </div>
+                <div class="meta-item">
+                    <strong>Priority:</strong> Now<br>
+                    <strong>Due:</strong> End of week
+                </div>
+            </div>
+        </div>
+        <p><strong>Key Concept:</strong> Rich metadata helps ADHD brains make better decisions about when/how to tackle tasks. Hyperfocus warnings prevent time loss.</p>
+    </div>
+    
+    <!-- Smart Suggestions -->
+    <div class="wireframe">
+        <h2>🤖 Smart Suggestions - ADHD-Aware Recommendations</h2>
+        <div style="background: #252525; border: 1px solid #252525; border-radius: 6px; padding: 16px; margin: 12px 0; border-left: 2px solid #eab308;">
+            <strong>💡 Energy Check:</strong> You've been coding for 2.5 hours. Consider a 15-minute walk before the next task?
+        </div>
+        <div style="background: #252525; border: 1px solid #252525; border-radius: 6px; padding: 16px; margin: 12px 0; border-left: 2px solid #3b82f6;">
+            <strong>⚡ Context Switch:</strong> You're at @computer but next task is "Call dentist" (@phone). Want to batch phone tasks for later?
+        </div>
+        <div style="background: #252525; border: 1px solid #252525; border-radius: 6px; padding: 16px; margin: 12px 0; border-left: 2px solid #ef4444;">
+            <strong>🚨 Hyperfocus Alert:</strong> "Learn TypeScript" is flagged as hyperfocus risk. Set a timer before starting!
+        </div>
+        <div style="background: #252525; border: 1px solid #252525; border-radius: 6px; padding: 16px; margin: 12px 0; border-left: 2px solid #10b981;">
+            <strong>🎯 Focus Suggestion:</strong> Based on your energy (High) and context (@computer), perfect time for "Fix login bug"!
+        </div>
+        <p><strong>Key Concept:</strong> Proactive suggestions help ADHD brains make better decisions and avoid common pitfalls.</p>
+    </div>
+    
+</body>
+</html>

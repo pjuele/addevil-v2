@@ -1,0 +1,3111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADDevil - ADHD Todo System</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="../public/favicons/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="../public/favicons/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="../public/favicons/favicon-96x96.png">
+    <link rel="apple-touch-icon" href="../public/favicons/apple-touch-icon.png">
+    <link rel="manifest" href="../public/favicons/site.webmanifest">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #09090b;
+            color: #E5E5E5;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .header-area {
+            display: flex;
+            align-items: center;
+            margin-bottom: 32px;
+            gap: 16px;
+        }
+
+        h1 {
+            color: #E5E5E5;
+            margin: 0;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .logo {
+            height: 3.5rem;
+            width: auto;
+            flex-shrink: 0;
+        }
+
+        .title-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: #9ca3af;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-area {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+            
+            .main-title {
+                font-size: 1.25rem;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .header-controls {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            color: #E5E5E5;
+            background: rgba(64, 64, 64, 0.3);
+        }
+
+        .icon-btn.disabled {
+            opacity: 0.4;
+        }
+
+        .icon-btn.reset:hover {
+            color: #ef4444;
+        }
+
+        /* Tooltip styles */
+        .icon-btn[title]:hover:after {
+            content: attr(title);
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            padding: 4px 8px;
+            background: #181818;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #E5E5E5;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .save-status {
+            font-size: 0.75rem;
+            color: #6b7280;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            width: 80px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .save-status.saving {
+            opacity: 1;
+            color: #eab308;
+        }
+
+        .save-status.saved {
+            opacity: 1;
+            color: #10b981;
+        }
+
+        /* Dashboard Layout - Desktop First */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
+            align-items: start;
+        }
+
+        /* Desktop order */
+        .long-list-column {
+            order: 1;
+        }
+        
+        .focus-list-column {
+            order: 2;
+        }
+        
+        .completed-list-column {
+            order: 3;
+        }
+        
+        .routine-list-column {
+            order: 4;
+        }
+
+        /* Tablet Layout */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            
+            .focus-list-column {
+                order: 1;
+            }
+            
+            .long-list-column {
+                order: 2;
+            }
+            
+            .routine-list-column {
+                order: 3;
+            }
+            
+            .completed-list-column {
+                order: 4;
+            }
+        }
+
+        /* Mobile Layout */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+            
+            /* Mobile-first priority order */
+            .focus-list-column {
+                order: 1;
+            }
+            
+            .long-list-column {
+                order: 2;
+            }
+            
+            .completed-list-column {
+                order: 3;
+            }
+            
+            .routine-list-column {
+                order: 4;
+            }
+            
+            h1 {
+                font-size: 1.25rem;
+                margin-bottom: 24px;
+            }
+        }
+
+        .list-column {
+            background: #181818;
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .list-column {
+                padding: 12px;
+            }
+            
+            .list-header {
+                font-size: 1rem;
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .task-item {
+                padding: 16px 12px;
+                margin: 6px 0;
+                font-size: 0.9rem;
+                min-height: 44px; /* Touch target size */
+                display: flex;
+                align-items: center;
+            }
+            
+            .task-meta {
+                font-size: 0.8rem;
+                margin-top: 6px;
+            }
+        }
+
+        .list-header {
+            background: #252525;
+            color: #E5E5E5;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+        }
+
+        /* Task Items */
+        .task-item {
+            background: #252525;
+            border: 1px solid #252525;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 0.875rem;
+            cursor: pointer;
+            color: #E5E5E5;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .task-item:hover {
+            background: #404040;
+            border-color: #404040;
+        }
+
+        /* Completed task styling */
+        .task-item.completed {
+            color: #6b7280;
+        }
+
+        .task-item.completed .task-meta {
+            color: #4b5563;
+        }
+
+        .task-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        /* Epic task styling */
+        .task-item.epic {
+            background: #404040;
+        }
+
+        .task-item.epic:hover {
+            background: #525252;
+        }
+
+        .task-item.epic .duration-epic {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .priority-today { border-left: 2px solid #ef4444; }
+        .priority-this-week { border-left: 2px solid #f97316; }
+        .priority-later { border-left: 2px solid #eab308; }
+        .priority-parking { border-left: 2px solid #6b7280; }
+
+        .task-meta {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .task-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .task-description {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+
+        .task-description:hover {
+            background: rgba(64, 64, 64, 0.3);
+        }
+
+        .task-description.empty {
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        .task-description.editing {
+            background: #404040;
+            border: 1px solid #6b7280;
+        }
+
+        /* Task Edit Form */
+        .task-edit-form {
+            background: #252525;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 4px 0;
+        }
+
+        .task-edit-form input[type="text"], 
+        .task-edit-form textarea,
+        .task-edit-form select {
+            width: 100%;
+            background: #404040;
+            border: 1px solid #6b7280;
+            border-radius: 4px;
+            padding: 8px;
+            color: #E5E5E5;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+        }
+
+        .task-edit-form textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .form-field {
+            flex: 1;
+        }
+
+        .form-field label {
+            display: block;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Chip selectors */
+        .chip-group {
+            display: flex;
+            gap: 2px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .chip {
+            background: #404040;
+            border: 1px solid #6b7280;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: #E5E5E5;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .chip:hover {
+            background: #6b7280;
+            border-color: #9ca3af;
+        }
+
+        .chip.selected {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #ffffff;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .form-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid;
+        }
+
+        .form-btn.save {
+            background: #10b981;
+            border-color: #10b981;
+            color: #ffffff;
+        }
+
+        .form-btn.save:hover {
+            background: #059669;
+        }
+
+        .form-btn.cancel {
+            background: transparent;
+            border-color: #6b7280;
+            color: #E5E5E5;
+        }
+
+        .form-btn.cancel:hover {
+            background: #404040;
+        }
+
+        /* Focus Mode */
+        .focus-mode {
+            background: url('../public/images/focus.jpg') center/cover no-repeat, #181818;
+            border: 1px solid #252525;
+            border-radius: 12px;
+            padding: 48px;
+            text-align: center;
+            margin-bottom: 32px;
+            display: none;
+            position: relative;
+        }
+
+        .focus-mode::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(24, 24, 24, 0.85);
+            border-radius: 12px;
+            z-index: 1;
+        }
+
+        .focus-mode > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .focus-mode.active {
+            display: block;
+        }
+
+        .current-task-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 24px 0;
+            color: #E5E5E5;
+        }
+
+        .timer {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 24px 0;
+            font-variant-numeric: tabular-nums;
+            color: #3b82f6;
+        }
+
+        .energy-bar {
+            width: 100%;
+            height: 8px;
+            background: #252525;
+            border-radius: 4px;
+            margin: 24px 0;
+            overflow: hidden;
+        }
+
+        .energy-fill {
+            height: 100%;
+            background: #10b981;
+            border-radius: 4px;
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+
+        .focus-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #252525;
+            color: #E5E5E5;
+            min-height: 44px; /* Touch target */
+        }
+
+        /* Mobile button optimizations */
+        @media (max-width: 768px) {
+            .focus-actions {
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 24px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 16px 24px;
+                font-size: 1rem;
+                min-height: 48px;
+            }
+            
+            #start-focus-btn {
+                font-size: 1.1rem;
+                padding: 18px 24px;
+                min-height: 52px;
+            }
+        }
+
+        .btn:hover {
+            background: #404040;
+        }
+
+        .btn.ready-to-focus {
+            background: #10b981;
+            color: #ffffff;
+            animation: gentlePulse 2s ease-in-out infinite;
+        }
+
+        .btn.ready-to-focus:hover {
+            background: #059669;
+        }
+
+        .icon-btn.ready-to-focus {
+            background: #10b981;
+            color: #ffffff;
+            animation: gentlePulse 2s ease-in-out infinite;
+        }
+
+        .icon-btn.ready-to-focus:hover {
+            background: #059669;
+        }
+
+        @keyframes gentlePulse {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .btn-done { 
+            background: #10b981; 
+            color: #ffffff;
+        }
+        .btn-done:hover {
+            background: #059669;
+        }
+        .btn-break { 
+            background: #eab308; 
+            color: #000000;
+        }
+        .btn-break:hover {
+            background: #ca8a04;
+        }
+        .btn-switch { 
+            background: #ef4444; 
+            color: #ffffff;
+        }
+        .btn-switch:hover {
+            background: #dc2626;
+        }
+
+        /* Drag and Drop */
+        .drop-zone {
+            border: 2px dashed transparent;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Smart Suggestions */
+        .suggestions {
+            background: #181818;
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .suggestion {
+            background: #252525;
+            border: 1px solid #252525;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .suggestion.energy { border-left: 2px solid #eab308; }
+        .suggestion.context { border-left: 2px solid #3b82f6; }
+        .suggestion.hyperfocus { border-left: 2px solid #ef4444; }
+        .suggestion.focus { border-left: 2px solid #10b981; }
+
+
+
+        /* Focus List Complete Message */
+        .focus-full-warning {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #10b981;
+            font-weight: 500;
+            display: none;
+        }
+
+        .focus-full-warning.show {
+            display: block;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .focus-full-warning .emoji {
+            font-size: 1.2em;
+            margin-right: 6px;
+        }
+
+        /* Mobile message optimization */
+        @media (max-width: 768px) {
+            .focus-full-warning {
+                padding: 16px;
+                font-size: 0.9rem;
+                margin: 16px 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes taskAdded {
+            from { 
+                opacity: 0; 
+                transform: translateY(-10px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .task-added {
+            animation: taskAdded 0.3s ease;
+        }
+
+        /* COMPLETION ANIMATIONS */
+        @keyframes completeTask {
+            0% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            25% { 
+                transform: scale(1.02) rotate(-1deg);
+                background: #10b981;
+                border-left-color: #10b981;
+                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            }
+            50% {
+                transform: scale(1.05) rotate(1deg);
+            }
+            75% {
+                transform: scale(1.02) rotate(-0.5deg);
+                background: #10b981;
+            }
+            100% { 
+                transform: scale(1) rotate(0deg);
+                background: #10b981;
+                border-left-color: #10b981;
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% { 
+                opacity: 0; 
+                transform: translateY(10px);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes quickPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .task-completing {
+            animation: completeTask 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            pointer-events: none;
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+
+        .pulse-feedback {
+            animation: quickPulse 0.3s ease-out;
+        }
+
+        @keyframes rejectFlash {
+            0% { 
+                background: #252525;
+                border-left-color: var(--original-border-color, #ef4444);
+            }
+            50% { 
+                background: rgba(239, 68, 68, 0.2);
+                border-left-color: #ef4444;
+                transform: scale(1.02);
+            }
+            100% { 
+                background: #252525;
+                border-left-color: var(--original-border-color, #ef4444);
+            }
+        }
+
+        .reject-flash {
+            animation: rejectFlash 0.6s ease-out;
+        }
+
+        /* Mobile-specific text display */
+        .mobile-text {
+            display: none;
+        }
+
+        .desktop-text {
+            display: inline;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-text {
+                display: inline;
+            }
+            
+            .desktop-text {
+                display: none;
+            }
+        }
+
+        /* Break/Paused overlay */
+        .paused-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .paused-content {
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .paused-title {
+            font-size: 2.5em;
+            margin: 0 0 20px 0;
+            color: #fbbf24;
+        }
+
+        .paused-subtitle {
+            font-size: 1.2em;
+            color: #9ca3af;
+            margin: 0 0 30px 0;
+        }
+
+        .break-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .break-option {
+            background: #252525;
+            border: 2px solid #404040;
+            border-radius: 12px;
+            padding: 20px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .break-option:hover {
+            border-color: #3b82f6;
+            background: #2563eb;
+        }
+
+        .break-option-icon {
+            font-size: 2em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .break-option-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #e5e5e5;
+        }
+
+        .break-option-desc {
+            font-size: 0.85em;
+            color: #9ca3af;
+        }
+
+        .resume-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .resume-btn:hover {
+            background: #047857;
+        }
+
+        /* Keyboard shortcuts legend */
+        .shortcuts-legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(24, 24, 24, 0.9);
+            border: 1px solid rgba(64, 64, 64, 0.8);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 0.8rem;
+            color: #e5e5e5;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            min-width: 180px;
+        }
+
+        .shortcuts-legend h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.85rem;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .shortcut-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .shortcut-key {
+            background: #404040;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #ffffff;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .shortcut-desc {
+            color: #9ca3af;
+            margin-left: 8px;
+            flex: 1;
+        }
+
+        /* Hide on mobile to save space */
+        @media (max-width: 768px) {
+            .shortcuts-legend {
+                display: none;
+            }
+        }
+
+        /* Task input shortcuts legend */
+        .task-input-shortcuts {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: rgba(24, 24, 24, 0.95);
+            border: 1px solid rgba(64, 64, 64, 0.8);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.75rem;
+            color: #e5e5e5;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(6px);
+            z-index: 1001;
+            min-width: 160px;
+            display: none;
+        }
+
+        .task-input-shortcuts h5 {
+            margin: 0 0 8px 0;
+            font-size: 0.8rem;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .task-input-shortcuts .shortcut-item {
+            margin-bottom: 4px;
+        }
+
+        .task-input-shortcuts .shortcut-key {
+            font-size: 0.7rem;
+            min-width: 35px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-area">
+        <h1>
+            <img src="../public/images/devil.png" alt="ADDevil Logo" class="logo">
+            <div class="title-text">
+                <span class="main-title">ADDevil</span>
+                <span class="subtitle">ADHD Todo System</span>
+            </div>
+        </h1>
+        <div class="header-controls">
+            <button class="btn" id="start-focus-btn" style="display: none;">
+                🚀 Start Focus Session
+            </button>
+            <button id="sound-toggle" class="icon-btn" title="Toggle sound">
+                <i data-lucide="volume-2"></i>
+            </button>
+            <button id="clear-data-btn" class="icon-btn reset" title="Reset to demo data">
+                <i data-lucide="rotate-ccw"></i>
+            </button>
+            <button id="clear-all-tasks-btn" class="icon-btn reset" title="Clear all tasks">
+                <i data-lucide="trash-2"></i>
+            </button>
+            <span id="save-status" class="save-status">Saved</span>
+        </div>
+    </div>
+    
+    <!-- Dashboard View -->
+    <div id="dashboard-view">
+        <div class="dashboard">
+            <!-- Focus List - Priority #1 on mobile -->
+            <div class="list-column focus-list-column">
+                <div class="list-header">
+                    <span id="focus-title">🎯 Today's Focus (0/3)</span>
+                    <button id="focus-play-btn" class="icon-btn" title="Start Focus Session (Enter)" style="display: none;">
+                        <i data-lucide="play"></i>
+                    </button>
+                </div>
+                <div class="focus-full-warning" id="focus-full-warning">
+                    <span class="emoji">✅</span>
+                    <strong>Focus List Complete!</strong><br>
+                    Perfect! You have 3 tasks ready to tackle
+                </div>
+                <div class="drop-zone" id="focus-list" data-list="focus">
+                    <div style="text-align: center; color: #6b7280; font-style: italic; margin-top: 50px;">
+                        <span class="mobile-text">Tap tasks from Long List below ↓</span>
+                        <span class="desktop-text">Drag tasks from Long List →</span><br>
+                        (Max 3 to prevent overwhelm)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Long List -->
+            <div class="list-column long-list-column">
+                <div class="list-header">
+                    🗂️ Long List (Everything)
+                    <button id="add-task-btn" class="icon-btn" title="Add new task">
+                        <i data-lucide="plus"></i>
+                    </button>
+                </div>
+                <div class="drop-zone" id="long-list" data-list="long">
+                    <!-- Tasks will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Completed -->
+            <div class="list-column completed-list-column">
+                <div class="list-header">
+                    ✅ Completed Today
+                    <span class="focus-counter" id="completed-counter">0</span>
+                </div>
+                <div class="drop-zone" id="completed-list" data-list="completed">
+                    <div style="text-align: center; color: #6b7280; font-style: italic; margin-top: 50px;">
+                        Completed tasks appear here<br>
+                        🎉 Dopamine rewards await!
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Routines -->
+            <div class="list-column routine-list-column">
+                <div class="list-header">
+                    ⏰ Routines & Habits
+                </div>
+                <div class="drop-zone" id="routine-list" data-list="routine">
+                    <!-- Routines will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Focus Mode View -->
+    <div id="focus-mode" class="focus-mode">
+        <div class="current-task-title" id="current-task-title">
+            Fix login bug - authentication redirect issue
+        </div>
+        <div class="timer" id="timer">25:00</div>
+        <div>Energy Level</div>
+        <div class="energy-bar">
+            <div class="energy-fill" id="energy-fill"></div>
+        </div>
+        <div class="focus-actions">
+            <button class="btn btn-done" id="complete-task">✅ Done</button>
+            <button class="btn btn-break" id="take-break">☕ Break</button>
+            <button class="btn btn-switch" id="switch-task">🔄 Switch Task</button>
+            <button class="btn" id="exit-focus">← Back to Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Smart Suggestions -->
+    <div class="suggestions" id="suggestions">
+        <h3 style="margin-top: 0;">🤖 Smart Suggestions</h3>
+        <div id="suggestion-list">
+            <!-- Suggestions will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Sample task data
+        const sampleTasks = {
+            long: [
+                { id: 1, title: "Fix login bug", priority: "today", duration: "2hr", energy: "high", description: "Authentication redirect issue" },
+                { id: 2, title: "Learn TypeScript", priority: "this week", duration: "Half day", energy: "high", hyperfocus: true, description: "Go through official documentation" },
+                { id: 3, title: "Call dentist", priority: "today", duration: "15min", energy: "low", description: "Schedule cleaning appointment" },
+                { id: 4, title: "Reorganize photos", priority: "parking", duration: "2hr", energy: "medium", description: "Sort and backup family photos" },
+                { id: 5, title: "Read React docs", priority: "later", duration: "1hr", energy: "medium", description: "New hooks and patterns" },
+                { id: 6, title: "Plan vacation", priority: "parking", duration: "1hr", energy: "low", description: "Research destinations and book flights" }
+            ],
+            focus: [],
+            completed: [],
+            routine: [
+                { id: 101, title: "☀️ Morning coffee + emails", type: "routine", trigger: "8:00 AM" },
+                { id: 102, title: "🍽️ Plan dinner by 3pm", type: "routine", trigger: "3:00 PM" },
+                { id: 103, title: "🧘 Evening wind-down", type: "routine", trigger: "9:00 PM" },
+                { id: 104, title: "📱 Check messages after lunch", type: "routine", trigger: "After lunch" }
+            ]
+        };
+
+        // Current state
+        let currentTasks = {};
+        let focusSession = {
+            active: false,
+            currentTask: null,
+            timeRemaining: 25 * 60, // 25 minutes in seconds
+            energy: 75
+        };
+
+        // Sound system for ADHD-friendly audio feedback
+        let soundSettings = {
+            enabled: true,
+            volume: 0.3
+        };
+
+        function createAudioContext() {
+            return new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playCompletionSound() {
+            if (!soundSettings.enabled) return;
+            
+            try {
+                const audioContext = createAudioContext();
+                
+                // Create ascending chime effect (C5, E5, G5 major chord)
+                const frequencies = [523.25, 659.25, 783.99];
+                
+                frequencies.forEach((freq, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.1);
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + index * 0.1);
+                    gainNode.gain.linearRampToValueAtTime(soundSettings.volume, audioContext.currentTime + index * 0.1 + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.1 + 0.4);
+                    
+                    oscillator.start(audioContext.currentTime + index * 0.1);
+                    oscillator.stop(audioContext.currentTime + index * 0.1 + 0.4);
+                });
+            } catch (error) {
+                console.log('Audio not supported or blocked');
+            }
+        }
+
+        function playFocusStartSound() {
+            if (!soundSettings.enabled) return;
+            
+            try {
+                const audioContext = createAudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 note
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(soundSettings.volume, audioContext.currentTime + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.6);
+            } catch (error) {
+                console.log('Audio not supported or blocked');
+            }
+        }
+
+        function playFailureSound() {
+            if (!soundSettings.enabled) return;
+            
+            try {
+                const audioContext = createAudioContext();
+                
+                // Create descending "error" tone (G4 to D4)
+                const frequencies = [392, 293.66];
+                
+                frequencies.forEach((freq, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.15);
+                    oscillator.type = 'triangle'; // Slightly harsher than sine for error feedback
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + index * 0.15);
+                    gainNode.gain.linearRampToValueAtTime(soundSettings.volume * 0.8, audioContext.currentTime + index * 0.15 + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.15 + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime + index * 0.15);
+                    oscillator.stop(audioContext.currentTime + index * 0.15 + 0.3);
+                });
+            } catch (error) {
+                console.log('Audio not supported or blocked');
+            }
+        }
+
+        function toggleSound(e) {
+            soundSettings.enabled = !soundSettings.enabled;
+            
+            // Update the icon and tooltip
+            updateSoundToggleDisplay();
+            
+            if (soundSettings.enabled) {
+                // Play a quick test sound
+                playFocusStartSound();
+            }
+            
+            saveTasksToLocalStorage();
+        }
+
+        // localStorage persistence functions
+        function saveTasksToLocalStorage() {
+            try {
+                const statusElement = document.getElementById('save-status');
+                if (statusElement) {
+                    statusElement.textContent = 'Saving...';
+                    statusElement.className = 'save-status saving';
+                }
+                
+                const dataToSave = {
+                    tasks: currentTasks,
+                    soundSettings: soundSettings,
+                    lastSaved: Date.now()
+                };
+                localStorage.setItem('addevil-tasks', JSON.stringify(dataToSave));
+                
+                if (statusElement) {
+                    setTimeout(() => {
+                        statusElement.textContent = 'Saved';
+                        statusElement.className = 'save-status saved';
+                        
+                        setTimeout(() => {
+                            statusElement.className = 'save-status';
+                        }, 2000);
+                    }, 200);
+                }
+            } catch (error) {
+                console.log('Could not save to localStorage:', error);
+                const statusElement = document.getElementById('save-status');
+                if (statusElement) {
+                    statusElement.textContent = 'Save failed';
+                    statusElement.className = 'save-status';
+                }
+            }
+        }
+
+        function loadTasksFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem('addevil-tasks');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    // Load tasks if they exist
+                    if (data.tasks) {
+                        currentTasks = data.tasks;
+                    }
+                    
+                    // Load sound settings if they exist
+                    if (data.soundSettings) {
+                        soundSettings = { ...soundSettings, ...data.soundSettings };
+                        updateSoundToggleDisplay();
+                    }
+                    
+                    return true;
+                }
+            } catch (error) {
+                console.log('Could not load from localStorage:', error);
+            }
+            return false;
+        }
+
+        function updateSoundToggleDisplay() {
+            const button = document.getElementById('sound-toggle');
+            if (button) {
+                const icon = button.querySelector('i') || button.querySelector('svg');
+                if (icon) {
+                    if (soundSettings.enabled) {
+                        icon.setAttribute('data-lucide', 'volume-2');
+                        button.classList.remove('disabled');
+                        button.title = 'Sound ON - Click to disable';
+                    } else {
+                        icon.setAttribute('data-lucide', 'volume-x');
+                        button.classList.add('disabled');
+                        button.title = 'Sound OFF - Click to enable';
+                    }
+                    lucide.createIcons();
+                } else {
+                    console.error('Icon element not found in sound toggle button');
+                }
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Reset to demo data? Your current tasks will be replaced with sample tasks.')) {
+                localStorage.removeItem('addevil-tasks');
+                currentTasks = JSON.parse(JSON.stringify(sampleTasks));
+                renderTasks();
+                updateSuggestions();
+                
+                // Show feedback
+                const statusElement = document.getElementById('save-status');
+                if (statusElement) {
+                    statusElement.textContent = 'Reset to demo';
+                    statusElement.className = 'save-status saved';
+                    setTimeout(() => {
+                        statusElement.className = 'save-status';
+                    }, 3000);
+                }
+            }
+        }
+
+        function clearAllTasks() {
+            if (confirm('Clear all tasks? This will remove all tasks from all lists (focus, long, routine, completed).')) {
+                // Clear all task lists
+                currentTasks = {
+                    focus: [],
+                    long: [],
+                    routine: [],
+                    completed: []
+                };
+                
+                renderTasks();
+                updateSuggestions();
+                saveTasksToLocalStorage();
+                
+                // Show feedback
+                const statusElement = document.getElementById('save-status');
+                if (statusElement) {
+                    statusElement.textContent = 'All tasks cleared';
+                    statusElement.className = 'save-status saved';
+                    setTimeout(() => {
+                        statusElement.className = 'save-status';
+                    }, 3000);
+                }
+            }
+        }
+
+        function showAddTaskForm() {
+            // Check if form already exists
+            if (document.getElementById('add-task-input')) {
+                document.getElementById('add-task-input').focus();
+                return;
+            }
+            
+            // Create input element
+            const input = document.createElement('input');
+            input.id = 'add-task-input';
+            input.type = 'text';
+            input.placeholder = 'Brain dump tasks here... Enter to add, ESC to close';
+            input.style.cssText = `
+                width: 100%;
+                padding: 12px;
+                margin: 8px 0;
+                background: #181818;
+                border: 2px solid #3b82f6;
+                border-radius: 6px;
+                color: #E5E5E5;
+                font-size: 0.875rem;
+                outline: none;
+            `;
+            
+            // Insert at top of long list
+            const longList = document.getElementById('long-list');
+            longList.insertBefore(input, longList.firstChild);
+            
+            // Create and show input shortcuts legend
+            createTaskInputShortcuts(input);
+            
+            input.focus();
+            
+            // Handle Enter key - save and reset
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && input.value.trim()) {
+                    addNewTask(input.value.trim());
+                    input.value = '';
+                    input.focus();
+                } else if (e.key === 'Escape') {
+                    removeAddTaskInput();
+                }
+            });
+            
+            // Handle click outside to close
+            document.addEventListener('click', function closeOnOutsideClick(e) {
+                if (!input.contains(e.target) && e.target.id !== 'add-task-btn') {
+                    removeAddTaskInput();
+                    document.removeEventListener('click', closeOnOutsideClick);
+                }
+            });
+        }
+        
+        function removeAddTaskInput() {
+            const input = document.getElementById('add-task-input');
+            const shortcuts = document.getElementById('task-input-shortcuts');
+            if (input) {
+                input.remove();
+            }
+            if (shortcuts) {
+                shortcuts.remove();
+            }
+        }
+        
+        function createTaskInputShortcuts(inputElement) {
+            // Don't create if already exists
+            if (document.getElementById('task-input-shortcuts')) {
+                return;
+            }
+            
+            // Create a wrapper div for the input and shortcuts
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'position: relative; display: block;';
+            
+            // Insert wrapper before input and move input into wrapper
+            inputElement.parentNode.insertBefore(wrapper, inputElement);
+            wrapper.appendChild(inputElement);
+            
+            // Create shortcuts text
+            const shortcuts = document.createElement('div');
+            shortcuts.id = 'task-input-shortcuts';
+            shortcuts.innerHTML = `
+                <div style="color: #9ca3af; font-size: 0.75rem; margin-bottom: 2px;">
+                    <kbd style="background: #404040; color: #fff; padding: 1px 4px; border-radius: 3px; font-size: 0.7rem;">Enter</kbd> Save & continue
+                </div>
+                <div style="color: #9ca3af; font-size: 0.75rem;">
+                    <kbd style="background: #404040; color: #fff; padding: 1px 4px; border-radius: 3px; font-size: 0.7rem;">Esc</kbd> Close
+                </div>
+            `;
+            
+            // Style the shortcuts container
+            shortcuts.style.cssText = `
+                padding: 6px 0 0 12px;
+                margin: 0 0 16px 0;
+                font-size: 0.75rem;
+            `;
+            
+            // Append shortcuts to the wrapper (below input)
+            wrapper.appendChild(shortcuts);
+            
+            console.log('Task input shortcuts created and positioned relative to input');
+        }
+
+        function addNewTask(title) {
+            // Generate new ID
+            const allTasks = [...currentTasks.focus, ...currentTasks.long, ...currentTasks.routine, ...currentTasks.completed];
+            const newId = allTasks.length > 0 ? Math.max(...allTasks.map(t => t.id)) + 1 : 1;
+            
+            // Create new task with ADHD-friendly defaults
+            const newTask = {
+                id: newId,
+                title: title,
+                priority: 'today',
+                duration: '30min',
+                energy: 'medium',
+                description: ''
+            };
+            
+            // Add to long list
+            currentTasks.long.unshift(newTask); // Add at top
+            
+            // Save the input element before re-render
+            const inputElement = document.getElementById('add-task-input');
+            const inputValue = inputElement ? inputElement.value : '';
+            
+            // Re-render and save
+            renderTasks();
+            saveTasksToLocalStorage();
+            updateSuggestions();
+            
+            // Restore the input box if it existed (but empty for next task)
+            if (inputElement) {
+                showAddTaskForm();
+                const newInput = document.getElementById('add-task-input');
+                if (newInput) {
+                    newInput.value = ''; // Clear for next task
+                    newInput.focus();
+                }
+            }
+        }
+
+        // Initialize the app
+        function init() {
+            // Try to load from localStorage first
+            const hasData = loadTasksFromLocalStorage();
+            
+            // If no saved data, use sample tasks
+            if (!hasData) {
+                currentTasks = JSON.parse(JSON.stringify(sampleTasks));
+            }
+            
+            renderTasks();
+            setupEventListeners();
+            updateSuggestions();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Auto-save every 30 seconds
+            setInterval(saveTasksToLocalStorage, 30000);
+        }
+
+        // Render tasks in their respective lists
+        function renderTasks() {
+            ['long', 'focus', 'routine', 'completed'].forEach(listType => {
+                const container = document.getElementById(`${listType}-list`);
+                const tasks = currentTasks[listType];
+                
+                if (listType === 'focus' && tasks.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #6b7280; font-style: italic; margin-top: 50px;">Drag tasks from Long List →<br>(Max 3 to prevent overwhelm)</div>';
+                } else if (listType === 'completed' && tasks.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #6b7280; font-style: italic; margin-top: 50px;">Completed tasks appear here<br>🎉 Dopamine rewards await!</div>';
+                } else if (listType === 'routine' && tasks.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #6b7280; font-style: italic; margin-top: 50px;">No routines set up yet<br>⏰ Add recurring habits here</div>';
+                } else {
+                    container.innerHTML = '';
+                }
+                
+                // Sort tasks by priority for better ADHD focus
+                const sortedTasks = [...tasks];
+                if (listType === 'long') {
+                    // Priority order: now (urgent), later (important), parking (low priority)
+                    const priorityOrder = { 'today': 0, 'this week': 1, 'later': 2, 'parking': 3 };
+                    sortedTasks.sort((a, b) => {
+                        const aPriority = priorityOrder[a.priority] ?? 99;
+                        const bPriority = priorityOrder[b.priority] ?? 99;
+                        return aPriority - bPriority;
+                    });
+                }
+                
+                sortedTasks.forEach(task => {
+                    const taskElement = createTaskElement(task, listType);
+                    container.appendChild(taskElement);
+                });
+                
+                updateFocusCounter();
+                updateCompletedCounter();
+                updateStartButton();
+            });
+        }
+
+        // Create a task DOM element
+        function createTaskElement(task, listType) {
+            const div = document.createElement('div');
+            div.className = `task-item priority-${(task.priority || 'parking').replace(/ /g, '-')}`;
+            div.draggable = listType !== 'routine' && listType !== 'completed';
+            div.dataset.taskId = task.id;
+            div.dataset.listType = listType;
+            
+            // Add completed class for styling
+            if (listType === 'completed') {
+                div.classList.add('completed');
+            }
+            
+            // Add epic class for styling
+            if (task.duration === 'Epic') {
+                div.classList.add('epic');
+            }
+            
+            let metaInfo = '';
+            if (task.duration) {
+                if (task.duration === 'Epic') {
+                    metaInfo += `<span class="duration-epic">😓 ${task.duration}</span>`;
+                } else {
+                    metaInfo += `${task.duration}`;
+                }
+            }
+            if (task.energy) metaInfo += ` • ${task.energy} energy`;
+            if (task.hyperfocus) metaInfo += ' • ⚠️ Hyperfocus risk';
+            if (task.completedAt) metaInfo += ` • Completed at ${task.completedAt}`;
+            
+            div.innerHTML = `
+                <div class="task-title">${listType === 'completed' ? '✅ ' + task.title : task.title}</div>
+                ${task.description ? `<div class="task-description" data-task-id="${task.id}">${task.description}</div>` : '<div class="task-description empty" data-task-id="' + task.id + '">Click to add description...</div>'}
+                ${metaInfo ? `<div class="task-meta">${metaInfo}</div>` : ''}
+                ${task.trigger ? `<div class="task-meta">${task.trigger}</div>` : ''}
+            `;
+            
+            return div;
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Drag and drop for desktop
+            document.addEventListener('dragstart', handleDragStart);
+            document.addEventListener('dragover', handleDragOver);
+            document.addEventListener('drop', handleDrop);
+            document.addEventListener('dragend', handleDragEnd);
+
+            // Touch interactions for mobile
+            document.addEventListener('click', handleTaskClick);
+
+            // Focus mode buttons
+            document.getElementById('start-focus-btn').addEventListener('click', startFocusSession);
+            document.getElementById('focus-play-btn').addEventListener('click', startFocusSession);
+            document.getElementById('complete-task').addEventListener('click', completeCurrentTask);
+            document.getElementById('take-break').addEventListener('click', takeBreak);
+            document.getElementById('switch-task').addEventListener('click', switchTask);
+            document.getElementById('exit-focus').addEventListener('click', exitFocusMode);
+            document.getElementById('sound-toggle').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSound(e);
+            });
+            document.getElementById('clear-data-btn').addEventListener('click', clearAllData);
+            document.getElementById('clear-all-tasks-btn').addEventListener('click', clearAllTasks);
+            document.getElementById('add-task-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                showAddTaskForm();
+            });
+            
+            // Global keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // + key to add task (but not when typing in input fields)
+                if (e.key === '+' && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    showAddTaskForm();
+                }
+                
+                // Enter key to start focus session (but not when typing in input fields)
+                if (e.key === 'Enter' && !e.target.matches('input, textarea') && currentTasks.focus.length > 0 && !focusSession.active) {
+                    e.preventDefault();
+                    startFocusSession();
+                }
+                
+                // ESC key to exit focus mode
+                if (e.key === 'Escape' && focusSession.active && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    exitFocusMode();
+                }
+            });
+        }
+
+        // Handle task clicks for mobile interaction and task editing
+        function handleTaskClick(e) {
+            // Skip if clicking on form elements
+            if (e.target.closest('.task-edit-form')) {
+                return;
+            }
+            
+            const taskItem = e.target.closest('.task-item');
+            if (!taskItem) return;
+            
+            const taskId = parseInt(taskItem.dataset.taskId);
+            const fromList = taskItem.dataset.listType;
+            
+            // Desktop: always edit task on click
+            if (window.innerWidth > 768) {
+                editTask(taskItem, taskId, fromList);
+                return;
+            }
+            
+            // Mobile: edit task unless it's a long->focus move
+            if (fromList === 'long') {
+                if (currentTasks.focus.length >= 3) {
+                    showSuggestion('🚨 Focus List Full: Max 3 tasks to prevent ADHD overwhelm!', 'hyperfocus');
+                    return;
+                }
+                
+                // Add visual feedback
+                taskItem.classList.add('pulse-feedback');
+                setTimeout(() => taskItem.classList.remove('pulse-feedback'), 300);
+                
+                // Move task to focus list
+                setTimeout(() => {
+                    moveTask(taskId, fromList, 'focus');
+                }, 300);
+            } else {
+                // Edit task on mobile for focus/routine/completed lists
+                editTask(taskItem, taskId, fromList);
+            }
+        }
+
+        // Full task editing functionality
+        function editTask(taskElement, taskId, listType) {
+            // Close any existing edit forms first
+            const hadExistingForms = closeAllEditForms();
+            
+            // If we closed forms, we need to find the task element again after re-render
+            if (hadExistingForms) {
+                taskElement = document.querySelector(`[data-task-id="${taskId}"][data-list-type="${listType}"]`);
+                if (!taskElement) return;
+            }
+            
+            // Find the task data
+            const task = currentTasks[listType].find(t => t.id === taskId);
+            if (!task) return;
+            
+            // Create edit form
+            const form = createTaskEditForm(task, taskId, listType);
+            
+            // Replace task element with form
+            taskElement.parentNode.replaceChild(form, taskElement);
+            
+            // Focus on title field
+            form.querySelector('input[name="title"]').focus();
+        }
+
+        function closeAllEditForms() {
+            const existingForms = document.querySelectorAll('.task-edit-form');
+            if (existingForms.length > 0) {
+                // Re-render to close all forms without saving
+                renderTasks();
+                return true; // Indicates we closed forms and re-rendered
+            }
+            return false; // No forms were open
+        }
+
+        function createTaskEditForm(task, taskId, listType) {
+            const form = document.createElement('div');
+            form.className = 'task-edit-form';
+            
+            const timeOptions = ['15min', '30min', '1hr', '2hr', 'Half day', 'Epic'];
+            const energyOptions = ['low', 'medium', 'high'];
+            const priorityOptions = ['today', 'this week', 'later', 'parking'];
+            
+            form.innerHTML = `
+                <div class="form-field">
+                    <label>Task Title</label>
+                    <input type="text" name="title" value="${task.title || ''}" placeholder="Enter task title...">
+                </div>
+                
+                <div class="form-field">
+                    <label>Duration</label>
+                    <div class="chip-group" data-field="duration">
+                        ${timeOptions.map(time => `
+                            <div class="chip ${task.duration === time ? 'selected' : ''}" 
+                                 data-value="${time}">${time}</div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="form-field">
+                    <label>Energy Level</label>
+                    <div class="chip-group" data-field="energy">
+                        ${energyOptions.map(energy => `
+                            <div class="chip ${task.energy === energy ? 'selected' : ''}" 
+                                 data-value="${energy}">${energy}</div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="form-field">
+                    <label>Priority</label>
+                    <div class="chip-group" data-field="priority">
+                        ${priorityOptions.map(priority => `
+                            <div class="chip ${task.priority === priority ? 'selected' : ''}" 
+                                 data-value="${priority}">${priority}</div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="form-field">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Add task description...">${task.description || ''}</textarea>
+                </div>
+            `;
+            
+            setupFormEventListeners(form, taskId, listType);
+            return form;
+        }
+
+        function setupFormEventListeners(form, taskId, listType) {
+            // Chip selection
+            form.querySelectorAll('.chip-group').forEach(group => {
+                group.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('chip')) {
+                        // Remove selected from siblings
+                        group.querySelectorAll('.chip').forEach(chip => 
+                            chip.classList.remove('selected')
+                        );
+                        // Add selected to clicked chip
+                        e.target.classList.add('selected');
+                    }
+                });
+            });
+            
+            // Enter key on title field saves and closes
+            form.querySelector('input[name="title"]').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveTaskChanges(form, taskId, listType);
+                }
+            });
+            
+            // Escape key cancels (don't save) and closes
+            form.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    renderTasks(); // Close without saving
+                }
+            });
+            
+            // Click outside form saves and closes
+            setTimeout(() => {
+                document.addEventListener('click', function closeOnOutsideClick(e) {
+                    if (!form.contains(e.target)) {
+                        saveTaskChanges(form, taskId, listType);
+                        document.removeEventListener('click', closeOnOutsideClick);
+                    }
+                });
+            }, 100); // Small delay to prevent immediate closure
+        }
+
+        function saveTaskChanges(form, taskId, listType) {
+            const formData = {
+                title: form.querySelector('input[name="title"]').value.trim(),
+                description: form.querySelector('textarea[name="description"]').value.trim(),
+                duration: form.querySelector('.chip-group[data-field="duration"] .chip.selected')?.dataset.value,
+                energy: form.querySelector('.chip-group[data-field="energy"] .chip.selected')?.dataset.value,
+                priority: form.querySelector('.chip-group[data-field="priority"] .chip.selected')?.dataset.value
+            };
+            
+            // Update task data
+            const task = currentTasks[listType].find(t => t.id === taskId);
+            if (task && formData.title) {
+                task.title = formData.title;
+                task.description = formData.description || undefined;
+                task.duration = formData.duration || undefined;
+                task.energy = formData.energy || undefined;
+                task.priority = formData.priority || 'parking';
+            }
+            
+            renderTasks();
+            saveTasksToLocalStorage();
+        }
+
+        // Drag and drop handlers
+        let draggedTask = null;
+
+        function handleDragStart(e) {
+            if (!e.target.classList.contains('task-item')) return;
+            draggedTask = {
+                id: parseInt(e.target.dataset.taskId),
+                fromList: e.target.dataset.listType
+            };
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            // Look for drop zone or entire column
+            let dropZone = e.target.closest('.drop-zone');
+            if (!dropZone) {
+                // If not over drop zone, check if we're in a column
+                const column = e.target.closest('.list-column');
+                if (column) {
+                    dropZone = column.querySelector('.drop-zone');
+                }
+            }
+            
+            if (dropZone) {
+                // Remove drag-over from all zones first, then add to current
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    zone.classList.remove('drag-over');
+                });
+                dropZone.classList.add('drag-over');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            // Look for drop zone or entire column
+            let dropZone = e.target.closest('.drop-zone');
+            if (!dropZone) {
+                // If not dropped on drop zone, check if we're in a column
+                const column = e.target.closest('.list-column');
+                if (column) {
+                    dropZone = column.querySelector('.drop-zone');
+                }
+            }
+            
+            if (!dropZone || !draggedTask) {
+                // Flash task red when dropped in invalid area
+                if (draggedTask) {
+                    showSuggestion('⚠️ Drop tasks only in the designated list areas', 'context');
+                    flashRejectedTask();
+                }
+                clearAllDragStates();
+                return;
+            }
+            
+            const toList = dropZone.dataset.list;
+            
+            // Validate drop
+            if (toList === 'focus' && currentTasks.focus.length >= 3) {
+                showSuggestion('🚨 Focus List Full: Max 3 tasks to prevent ADHD overwhelm!', 'hyperfocus');
+                
+                // Show warning temporarily and animate it
+                const warning = document.getElementById('focus-full-warning');
+                if (warning) {
+                    warning.classList.add('show');
+                    warning.style.animation = 'none';
+                    warning.offsetHeight; // Trigger reflow
+                    warning.style.animation = 'quickPulse 0.5s ease-out';
+                    
+                    // Hide after 2 seconds
+                    setTimeout(() => {
+                        warning.classList.remove('show');
+                    }, 2000);
+                }
+                
+                // Flash the rejected task red
+                flashRejectedTask();
+                
+                clearAllDragStates();
+                return;
+            }
+            
+            if (toList === 'routine' && draggedTask.fromList !== 'routine') {
+                showSuggestion('⚠️ Regular tasks cannot be added to Routines section', 'context');
+                
+                // Flash the rejected task red
+                flashRejectedTask();
+                
+                clearAllDragStates();
+                return; // Can't drag regular tasks to routines
+            }
+            
+            // Move the task
+            moveTask(draggedTask.id, draggedTask.fromList, toList);
+            
+            // Clear all drag states after successful drop
+            clearAllDragStates();
+        }
+
+        function handleDragEnd(e) {
+            if (e.target.classList.contains('task-item')) {
+                e.target.classList.remove('dragging');
+            }
+            clearAllDragStates();
+            draggedTask = null;
+        }
+
+        // Helper function to clear all drag-related visual states
+        function clearAllDragStates() {
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.classList.remove('drag-over');
+            });
+            document.querySelectorAll('.task-item').forEach(item => {
+                item.classList.remove('dragging');
+            });
+        }
+
+        // Helper function to flash rejected task red
+        function flashRejectedTask() {
+            if (!draggedTask) return;
+            
+            // Play failure sound
+            playFailureSound();
+            
+            const rejectedTaskElement = document.querySelector(`[data-task-id="${draggedTask.id}"][data-list-type="${draggedTask.fromList}"]`);
+            if (rejectedTaskElement) {
+                rejectedTaskElement.classList.add('reject-flash');
+                setTimeout(() => {
+                    rejectedTaskElement.classList.remove('reject-flash');
+                }, 600);
+            }
+        }
+
+        // Move task between lists
+        function moveTask(taskId, fromList, toList) {
+            const taskIndex = currentTasks[fromList].findIndex(t => t.id === taskId);
+            if (taskIndex === -1) return;
+            
+            const task = currentTasks[fromList].splice(taskIndex, 1)[0];
+            currentTasks[toList].push(task);
+            
+            renderTasks();
+            saveTasksToLocalStorage();
+            
+            // Add entrance animation to newly added tasks
+            setTimeout(() => {
+                const newTaskElement = document.querySelector(`#${toList}-list [data-task-id="${taskId}"]`);
+                if (newTaskElement) {
+                    newTaskElement.classList.add('fade-in');
+                    // Add a little celebration if moving to focus
+                    if (toList === 'focus') {
+                        setTimeout(() => newTaskElement.classList.add('pulse-feedback'), 400);
+                    }
+                }
+            }, 50);
+            
+            updateSuggestions();
+            
+            if (toList === 'focus') {
+                showSuggestion(`✅ Added "${task.title}" to Focus List`, 'focus');
+                playFocusStartSound();
+            } else if (toList === 'completed') {
+                celebrateTaskCompletion(task.title, taskId);
+            }
+        }
+
+        // Shared completion celebration - reused by focus mode and drag-to-complete
+        function celebrateTaskCompletion(taskTitle, taskId) {
+            showSuggestion(`🎉 Completed "${taskTitle}"! Great job!`, 'focus');
+            playCompletionSound();
+            
+            // Add completion animation
+            setTimeout(() => {
+                const completedTaskElement = document.querySelector(`#completed-list [data-task-id="${taskId}"]`);
+                if (completedTaskElement) {
+                    completedTaskElement.classList.add('completion-celebration');
+                }
+            }, 100);
+        }
+
+        // Update focus counter
+        function updateFocusCounter() {
+            const title = document.getElementById('focus-title');
+            const warning = document.getElementById('focus-full-warning');
+            const count = currentTasks.focus.length;
+            
+            // Show "(Complete)" instead of "(3/3)" when at maximum
+            if (count >= 3) {
+                title.textContent = '🎯 Today\'s Focus (Complete)';
+            } else {
+                title.textContent = `🎯 Today's Focus (${count}/3)`;
+            }
+            
+            // Only show warning temporarily when first reaching 3 tasks
+            if (count >= 3) {
+                // Only show if not already visible (prevent re-triggering)
+                if (!warning.classList.contains('show')) {
+                    warning.classList.add('show');
+                    // Auto-hide after 3 seconds
+                    setTimeout(() => {
+                        warning.classList.remove('show');
+                    }, 3000);
+                }
+            } else {
+                warning.classList.remove('show');
+            }
+        }
+
+        // Update completed counter
+        function updateCompletedCounter() {
+            const counter = document.getElementById('completed-counter');
+            const count = currentTasks.completed.length;
+            counter.textContent = count.toString();
+        }
+
+        // Update start focus button
+        function updateStartButton() {
+            const btn = document.getElementById('start-focus-btn');
+            const playBtn = document.getElementById('focus-play-btn');
+            const count = currentTasks.focus.length;
+            
+            if (count > 0) {
+                btn.style.display = 'inline-block';
+                playBtn.style.display = 'inline-block';
+                
+                // Update button text and styling based on focus list state
+                if (count >= 3) {
+                    btn.classList.add('ready-to-focus');
+                    btn.textContent = '🚀 Ready to Focus - Start Session!';
+                    playBtn.title = '🚀 Ready to Focus - Start Session! (Enter)';
+                } else {
+                    btn.classList.remove('ready-to-focus');
+                    btn.textContent = '🚀 Start Focus Session';
+                    playBtn.title = 'Start Focus Session (Enter)';
+                }
+            } else {
+                btn.style.display = 'none';
+                playBtn.style.display = 'none';
+                btn.classList.remove('ready-to-focus');
+            }
+        }
+
+        // Focus session management
+        function startFocusSession() {
+            if (currentTasks.focus.length === 0) return;
+            
+            // Play focus start sound
+            playFocusStartSound();
+            
+            focusSession.active = true;
+            focusSession.currentTask = currentTasks.focus[0];
+            focusSession.timeRemaining = 25 * 60;
+            
+            document.getElementById('dashboard-view').style.display = 'none';
+            document.getElementById('focus-mode').classList.add('active');
+            document.getElementById('current-task-title').textContent = focusSession.currentTask.title;
+            
+            startTimer();
+            updateSuggestions();
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            
+            focusSession.timerId = setInterval(() => {
+                focusSession.timeRemaining--;
+                
+                const minutes = Math.floor(focusSession.timeRemaining / 60);
+                const seconds = focusSession.timeRemaining % 60;
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Update energy (decreases over time)
+                focusSession.energy = Math.max(20, focusSession.energy - 0.1);
+                document.getElementById('energy-fill').style.width = focusSession.energy + '%';
+                
+                if (focusSession.timeRemaining <= 0) {
+                    clearInterval(focusSession.timerId);
+                    showSuggestion('🎉 Pomodoro complete! Time for a break.', 'focus');
+                }
+            }, 1000);
+        }
+
+        function completeCurrentTask() {
+            if (!focusSession.currentTask) return;
+            
+            // Exit focus mode first to show dashboard, then animate
+            document.getElementById('dashboard-view').style.display = 'block';
+            document.getElementById('focus-mode').classList.remove('active');
+            clearInterval(focusSession.timerId);
+            
+            // Find the task element in focus list for animation
+            setTimeout(() => {
+                const taskElement = document.querySelector(`#focus-list [data-task-id="${focusSession.currentTask.id}"]`);
+                
+                if (taskElement) {
+                    // Apply completion animation
+                    taskElement.classList.add('task-completing');
+                    
+                    // Wait for animation to complete before moving task
+                    setTimeout(() => {
+                        completeTaskAfterAnimation();
+                    }, 800);
+                } else {
+                    completeTaskAfterAnimation();
+                }
+            }, 100);
+        }
+
+        function completeTaskAfterAnimation() {
+            if (!focusSession.currentTask) return;
+            
+            // Play completion sound
+            playCompletionSound();
+            
+            // Add completed timestamp and move to completed list
+            const completedTask = { 
+                ...focusSession.currentTask, 
+                completedAt: new Date().toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                })
+            };
+            
+            // Remove from focus list and add to completed list
+            currentTasks.focus = currentTasks.focus.filter(t => t.id !== focusSession.currentTask.id);
+            currentTasks.completed.push(completedTask);
+            
+            // Reset focus session
+            focusSession.active = false;
+            focusSession.currentTask = null;
+            
+            saveTasksToLocalStorage();
+            
+            renderTasks();
+            updateSuggestions();
+            
+            showSuggestion(`🎉 Completed "${focusSession.currentTask?.title || 'task'}"! Great job! Check your Completed list for that dopamine hit!`, 'focus');
+        }
+
+        function completeTaskWithoutAnimation() {
+            if (!focusSession.currentTask) return;
+            
+            // Play completion sound
+            playCompletionSound();
+            
+            const completedTask = { 
+                ...focusSession.currentTask, 
+                completedAt: new Date().toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                })
+            };
+            
+            currentTasks.focus = currentTasks.focus.filter(t => t.id !== focusSession.currentTask.id);
+            currentTasks.completed.push(completedTask);
+            
+            saveTasksToLocalStorage();
+            showSuggestion(`🎉 Completed "${focusSession.currentTask.title}"! Great job!`, 'focus');
+            exitFocusMode();
+        }
+
+        function takeBreak() {
+            clearInterval(focusSession.timerId);
+            focusSession.energy = Math.min(100, focusSession.energy + 20);
+            
+            showBreakMenu();
+            showSuggestion('Work paused. Choose a break activity or resume when ready.', 'energy');
+        }
+
+        function showBreakMenu() {
+            // Remove any existing overlay
+            const existingOverlay = document.querySelector('.paused-overlay');
+            if (existingOverlay) existingOverlay.remove();
+            
+            // Create paused overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'paused-overlay';
+            overlay.innerHTML = `
+                <div class="paused-content">
+                    <div class="paused-title">⏸️ Paused</div>
+                    <div class="paused-subtitle">Take a break and recharge</div>
+                    
+                    <div class="break-options">
+                        <div class="break-option" data-break="timer">
+                            <span class="break-option-icon">⏰</span>
+                            <div class="break-option-title">5-Min Timer</div>
+                            <div class="break-option-desc">Gentle notification to return</div>
+                        </div>
+                        
+                        <div class="break-option" data-break="breathing">
+                            <span class="break-option-icon">🫁</span>
+                            <div class="break-option-title">Breathing</div>
+                            <div class="break-option-desc">4-7-8 technique</div>
+                        </div>
+                        
+                        <div class="break-option" data-break="movement">
+                            <span class="break-option-icon">🚶</span>
+                            <div class="break-option-title">Movement</div>
+                            <div class="break-option-desc">Stretch or walk suggestions</div>
+                        </div>
+                        
+                        <div class="break-option" data-break="distraction">
+                            <span class="break-option-icon">📝</span>
+                            <div class="break-option-title">Brain Dump</div>
+                            <div class="break-option-desc">Capture intrusive thoughts</div>
+                        </div>
+                    </div>
+                    
+                    <button class="resume-btn" onclick="resumeWork()">▶️ Resume Work</button>
+                </div>
+            `;
+            
+            // Add click handlers for break options
+            overlay.addEventListener('click', (e) => {
+                const option = e.target.closest('.break-option');
+                if (option) {
+                    const breakType = option.dataset.break;
+                    handleBreakOption(breakType);
+                    return;
+                }
+                
+                // Click outside - resume work
+                if (e.target === overlay) {
+                    resumeWork();
+                }
+            });
+            
+            // ESC key handler for break menu
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    resumeWork();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+            
+            document.body.appendChild(overlay);
+        }
+
+        function resumeWork() {
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+            
+            // Clear any existing focus timer before starting a new one
+            if (focusSession.timerId) {
+                clearInterval(focusSession.timerId);
+            }
+            
+            // Restart the focus timer
+            startTimer();
+            
+            showSuggestion('🎯 Back to work! You got this!', 'focus');
+        }
+
+        let breakTimer = {
+            active: false,
+            timeRemaining: 0,
+            intervalId: null
+        };
+
+        function handleBreakOption(breakType) {
+            switch(breakType) {
+                case 'timer':
+                    startBreakTimer();
+                    break;
+                case 'breathing':
+                    startBreathingExercise();
+                    break;
+                case 'movement':
+                    startMovementBreak();
+                    break;
+                case 'distraction':
+                    startBrainDump();
+                    break;
+            }
+        }
+
+        function startBreakTimer() {
+            // Close the paused overlay and remove any existing ESC handlers
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            // Clean up any existing timer interval first
+            if (breakTimer.intervalId) {
+                clearInterval(breakTimer.intervalId);
+            }
+            
+            // Remove all existing keydown listeners to prevent conflicts
+            document.removeEventListener('keydown', breakTimer.escHandler);
+            
+            // Create break timer overlay
+            breakTimer.active = true;
+            breakTimer.timeRemaining = 20; // 20 seconds for testing
+            
+            const timerOverlay = document.createElement('div');
+            timerOverlay.className = 'paused-overlay';
+            timerOverlay.innerHTML = `
+                <div class="paused-content">
+                    <div class="paused-title">⏰</div>
+                    <div class="paused-subtitle">Break Time</div>
+                    
+                    <div style="margin: 30px 0;">
+                        <div id="break-timer-display" style="font-size: 3em; font-weight: bold; color: #10b981; margin-bottom: 10px;">0:20</div>
+                        <div style="color: #9ca3af;">Take a moment to rest your mind</div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button class="resume-btn" onclick="skipBreakTimer()" style="background: #6b7280;">Skip Break</button>
+                        <button class="resume-btn" onclick="addBreakTime()" style="background: #3b82f6;">+1 Min</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add click outside to go back to break menu
+            timerOverlay.addEventListener('click', (e) => {
+                if (e.target === timerOverlay) {
+                    cancelBreakTimer();
+                }
+            });
+            
+            // ESC key handler specifically for timer
+            breakTimer.escHandler = (e) => {
+                if (e.key === 'Escape' && breakTimer.active) {
+                    e.stopImmediatePropagation();
+                    cancelBreakTimer();
+                }
+            };
+            document.addEventListener('keydown', breakTimer.escHandler);
+            
+            document.body.appendChild(timerOverlay);
+            
+            // Start countdown
+            breakTimer.intervalId = setInterval(updateBreakTimer, 1000);
+            updateBreakTimer(); // Initial update
+            
+            showSuggestion('⏰ 5-minute break started. Stretch, hydrate, or just breathe!', 'energy');
+        }
+
+        function updateBreakTimer() {
+            const display = document.getElementById('break-timer-display');
+            if (!display) return;
+            
+            const minutes = Math.floor(breakTimer.timeRemaining / 60);
+            const seconds = breakTimer.timeRemaining % 60;
+            display.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            breakTimer.timeRemaining--;
+            
+            if (breakTimer.timeRemaining < 0) {
+                completeBreakTimer();
+            }
+        }
+
+        function completeBreakTimer() {
+            clearInterval(breakTimer.intervalId);
+            breakTimer.active = false;
+            
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            // Gentle completion notification with sound
+            playCompletionSound();
+            showSuggestion('✨ Break complete! Feeling refreshed? Ready to focus again!', 'focus');
+            
+            // Auto-resume work
+            setTimeout(() => {
+                startTimer();
+            }, 2000);
+        }
+
+        function skipBreakTimer() {
+            if (breakTimer.active) {
+                clearInterval(breakTimer.intervalId);
+                breakTimer.active = false;
+                
+                const overlay = document.querySelector('.paused-overlay');
+                if (overlay) overlay.remove();
+                
+                // Clean up ESC listener
+                document.removeEventListener('keydown', arguments.callee.escHandler);
+                
+                showSuggestion('⚡ Break skipped. Back to focused work!', 'focus');
+                startTimer();
+            }
+        }
+
+        function cancelBreakTimer() {
+            if (breakTimer.active) {
+                clearInterval(breakTimer.intervalId);
+                breakTimer.active = false;
+                breakTimer.intervalId = null; // Clear the reference
+                
+                // Clean up timer's ESC listener
+                document.removeEventListener('keydown', breakTimer.escHandler);
+                
+                const overlay = document.querySelector('.paused-overlay');
+                if (overlay) overlay.remove();
+                
+                // Return to main break menu
+                showBreakMenu();
+            }
+        }
+
+        function addBreakTime() {
+            if (breakTimer.active) {
+                breakTimer.timeRemaining += 60; // Add 1 minute
+                showSuggestion('⏰ Added 1 minute to break timer', 'energy');
+            }
+        }
+
+        const movementSuggestions = [
+            // Quick Desk Breaks (30 seconds - 2 minutes)
+            { icon: '🤸', title: 'Desk Push-ups', desc: 'Stand and do 10 desk push-ups', duration: '1 min', type: 'quick' },
+            { icon: '🙆', title: 'Neck Rolls', desc: '5 clockwise, 5 counter-clockwise', duration: '30 sec', type: 'quick' },
+            { icon: '👐', title: 'Shoulder Squeezes', desc: 'Squeeze shoulder blades together 10x', duration: '30 sec', type: 'quick' },
+            { icon: '🦵', title: 'Calf Raises', desc: 'Rise up on toes 20 times', duration: '1 min', type: 'quick' },
+            { icon: '🫴', title: 'Hand Shake-out', desc: 'Shake hands and wrists vigorously', duration: '30 sec', type: 'quick' },
+            { icon: '🤲', title: 'Wrist Circles', desc: '10 circles each direction, both hands', duration: '30 sec', type: 'quick' },
+            
+            // Energy Boosters (2-5 minutes)  
+            { icon: '🚶', title: 'Mindful Walk', desc: 'Walk to kitchen and back mindfully', duration: '2 min', type: 'energy' },
+            { icon: '🧘', title: 'Reach & Touch', desc: 'Touch toes 10x, reach for sky 10x', duration: '2 min', type: 'energy' },
+            { icon: '💃', title: 'Dance Break', desc: 'Put on one song and dance!', duration: '3 min', type: 'energy' },
+            { icon: '🪜', title: 'Stair Climb', desc: 'Find stairs: up and down once', duration: '3 min', type: 'energy' },
+            { icon: '🌬️', title: 'Fresh Air', desc: 'Step outside for 5 deep breaths', duration: '2 min', type: 'energy' },
+            { icon: '🤸‍♂️', title: 'Jumping Jacks', desc: '20 jumping jacks to get blood flowing', duration: '1 min', type: 'energy' }
+        ];
+
+        let currentMovement = null;
+        let movementTimer = { active: false, timeRemaining: 0, intervalId: null };
+
+        function startMovementBreak() {
+            // Close break menu
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            // Pick random movement suggestion
+            currentMovement = movementSuggestions[Math.floor(Math.random() * movementSuggestions.length)];
+            
+            const movementOverlay = document.createElement('div');
+            movementOverlay.className = 'paused-overlay';
+            movementOverlay.innerHTML = `
+                <div class="paused-content">
+                    <div class="paused-title">${currentMovement.icon}</div>
+                    <div class="paused-subtitle">${currentMovement.title}</div>
+                    
+                    <div style="margin: 30px 0;">
+                        <div style="font-size: 1.2em; color: #e5e5e5; margin-bottom: 15px; line-height: 1.4;">
+                            ${currentMovement.desc}
+                        </div>
+                        <div style="color: #9ca3af; font-size: 0.9em;">
+                            Suggested duration: ${currentMovement.duration}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="resume-btn" onclick="skipToNextMovement()" style="background: #3b82f6;">Next Exercise</button>
+                        <button class="resume-btn" onclick="startMovementTimer()" style="background: #059669;">Start Timer</button>
+                        <button class="resume-btn" onclick="finishMovement()" style="background: #059669;">I'm Done!</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add click outside and ESC to go back to break menu
+            movementOverlay.addEventListener('click', (e) => {
+                if (e.target === movementOverlay) {
+                    showBreakMenu();
+                }
+            });
+            
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    showBreakMenu();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+            
+            document.body.appendChild(movementOverlay);
+            showSuggestion(`🚶 Movement break: ${currentMovement.title}. Take your time!`, 'energy');
+        }
+
+        function skipToNextMovement() {
+            // Pick a different random movement
+            let newMovement;
+            do {
+                newMovement = movementSuggestions[Math.floor(Math.random() * movementSuggestions.length)];
+            } while (newMovement === currentMovement && movementSuggestions.length > 1);
+            
+            currentMovement = newMovement;
+            
+            // Update the overlay content
+            const content = document.querySelector('.paused-content');
+            if (content) {
+                content.innerHTML = `
+                    <div class="paused-title">${currentMovement.icon}</div>
+                    <div class="paused-subtitle">${currentMovement.title}</div>
+                    
+                    <div style="margin: 30px 0;">
+                        <div style="font-size: 1.2em; color: #e5e5e5; margin-bottom: 15px; line-height: 1.4;">
+                            ${currentMovement.desc}
+                        </div>
+                        <div style="color: #9ca3af; font-size: 0.9em;">
+                            Suggested duration: ${currentMovement.duration}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="resume-btn" onclick="skipToNextMovement()" style="background: #3b82f6;">Next Exercise</button>
+                        <button class="resume-btn" onclick="startMovementTimer()" style="background: #059669;">Start Timer</button>
+                        <button class="resume-btn" onclick="finishMovement()" style="background: #059669;">I'm Done!</button>
+                    </div>
+                `;
+            }
+            
+            showSuggestion(`🔄 New exercise: ${currentMovement.title}`, 'energy');
+        }
+
+        function startMovementTimer() {
+            // Parse duration and start countdown
+            const duration = currentMovement.duration;
+            let seconds = 60; // default 1 minute
+            
+            if (duration.includes('30 sec')) seconds = 30;
+            else if (duration.includes('2 min')) seconds = 120;
+            else if (duration.includes('3 min')) seconds = 180;
+            
+            movementTimer.active = true;
+            movementTimer.timeRemaining = seconds;
+            
+            // Update display to show timer
+            const content = document.querySelector('.paused-content');
+            if (content) {
+                content.innerHTML = `
+                    <div class="paused-title">${currentMovement.icon}</div>
+                    <div class="paused-subtitle">${currentMovement.title}</div>
+                    
+                    <div style="margin: 30px 0;">
+                        <div id="movement-timer-display" style="font-size: 3em; font-weight: bold; color: #059669; margin-bottom: 15px;">
+                            ${Math.floor(seconds/60)}:${(seconds%60).toString().padStart(2, '0')}
+                        </div>
+                        <div style="color: #9ca3af; font-size: 0.9em;">
+                            ${currentMovement.desc}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button class="resume-btn" onclick="finishMovement()" style="background: #059669;">Finished Early!</button>
+                    </div>
+                `;
+            }
+            
+            // Start countdown
+            movementTimer.intervalId = setInterval(updateMovementTimer, 1000);
+            showSuggestion(`⏰ ${currentMovement.title} timer started! Get moving!`, 'energy');
+        }
+
+        function updateMovementTimer() {
+            const display = document.getElementById('movement-timer-display');
+            if (!display) return;
+            
+            const minutes = Math.floor(movementTimer.timeRemaining / 60);
+            const seconds = movementTimer.timeRemaining % 60;
+            display.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            movementTimer.timeRemaining--;
+            
+            if (movementTimer.timeRemaining < 0) {
+                finishMovementTimer();
+            }
+        }
+
+        function finishMovementTimer() {
+            if (movementTimer.intervalId) {
+                clearInterval(movementTimer.intervalId);
+                movementTimer.active = false;
+                movementTimer.intervalId = null;
+            }
+            
+            playCompletionSound();
+            showSuggestion(`💪 Great job! Hope you feel energized and ready to focus!`, 'focus');
+            
+            // Auto-close and resume work after a moment
+            setTimeout(() => {
+                const overlay = document.querySelector('.paused-overlay');
+                if (overlay) overlay.remove();
+                startTimer();
+            }, 2000);
+        }
+
+        function finishMovement() {
+            if (movementTimer.active) {
+                clearInterval(movementTimer.intervalId);
+                movementTimer.active = false;
+                movementTimer.intervalId = null;
+            }
+            
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            playCompletionSound();
+            showSuggestion('💪 Excellent! Movement break complete. Ready to focus!', 'focus');
+            startTimer();
+        }
+
+        function startBrainDump() {
+            // Close break menu
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            // Load existing brain dump content
+            const savedDump = localStorage.getItem('adhd-brain-dump') || '';
+            
+            const brainDumpOverlay = document.createElement('div');
+            brainDumpOverlay.className = 'paused-overlay';
+            brainDumpOverlay.innerHTML = `
+                <div class="paused-content" style="max-width: 600px;">
+                    <div class="paused-title">📝</div>
+                    <div class="paused-subtitle">Brain Dump</div>
+                    
+                    <div style="margin: 20px 0;">
+                        <div style="color: #9ca3af; font-size: 0.9em; margin-bottom: 10px;">
+                            Dump all your racing thoughts here - no pressure to organize!
+                        </div>
+                        <textarea 
+                            id="brain-dump-text" 
+                            placeholder="All those 'I need to remember...' thoughts go here. Just type and let it all out."
+                            style="width: 100%; height: 200px; background: #181818; border: 2px solid #404040; border-radius: 8px; padding: 12px; color: #e5e5e5; font-family: inherit; font-size: 1em; resize: vertical; line-height: 1.4;"
+                            autofocus
+                        >${savedDump}</textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                        <button class="category-btn" data-category="💡 Ideas" style="background: #252525; border: 1px solid #404040; color: #e5e5e5; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85em;">💡 Ideas</button>
+                        <button class="category-btn" data-category="📝 Tasks" style="background: #252525; border: 1px solid #404040; color: #e5e5e5; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85em;">📝 Tasks</button>
+                        <button class="category-btn" data-category="🛒 Shopping" style="background: #252525; border: 1px solid #404040; color: #e5e5e5; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85em;">🛒 Shopping</button>
+                        <button class="category-btn" data-category="💭 Random" style="background: #252525; border: 1px solid #404040; color: #e5e5e5; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85em;">💭 Random</button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button class="resume-btn" onclick="clearBrainDump()" style="background: #ef4444;">Clear & Resume</button>
+                        <button class="resume-btn" onclick="saveBrainDump()" style="background: #059669;">Save & Resume</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add click outside and ESC to save and go back to break menu
+            brainDumpOverlay.addEventListener('click', (e) => {
+                if (e.target === brainDumpOverlay) {
+                    saveBrainDumpContent();
+                    showBreakMenu();
+                }
+            });
+            
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    saveBrainDumpContent();
+                    showBreakMenu();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+            
+            document.body.appendChild(brainDumpOverlay);
+            
+            // Auto-save as user types
+            const textarea = document.getElementById('brain-dump-text');
+            textarea.addEventListener('input', saveBrainDumpContent);
+            
+            // Category button handlers
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const category = e.target.dataset.category;
+                    const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    const prefix = `\\n\\n[${timestamp}] ${category}: `;
+                    
+                    textarea.value += prefix;
+                    textarea.focus();
+                    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+                    saveBrainDumpContent();
+                });
+            });
+            
+            showSuggestion('📝 Brain dump time! Get all those thoughts out of your head.', 'energy');
+        }
+
+        function saveBrainDumpContent() {
+            const textarea = document.getElementById('brain-dump-text');
+            if (textarea) {
+                localStorage.setItem('adhd-brain-dump', textarea.value);
+            }
+        }
+
+        function clearBrainDump() {
+            localStorage.removeItem('adhd-brain-dump');
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            showSuggestion('🧹 Brain cleared! Back to focused work with a clean mental slate.', 'focus');
+            startTimer();
+        }
+
+        function saveBrainDump() {
+            saveBrainDumpContent();
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            const textarea = document.getElementById('brain-dump-text');
+            const hasContent = textarea && textarea.value.trim().length > 0;
+            
+            if (hasContent) {
+                showSuggestion('💾 Thoughts captured! Your mental space is now clear to focus.', 'focus');
+            } else {
+                showSuggestion('🧘 Sometimes just having the space to think is enough. Back to work!', 'focus');
+            }
+            startTimer();
+        }
+
+        let breathingSession = {
+            active: false,
+            phase: 'ready', // 'ready', 'inhale', 'hold', 'exhale', 'pause'
+            cycleCount: 0,
+            targetCycles: 4,
+            phaseTimer: null,
+            phaseDuration: 0
+        };
+
+        function startBreathingExercise() {
+            // Close break menu
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            // Reset breathing session
+            breathingSession.active = true;
+            breathingSession.phase = 'ready';
+            breathingSession.cycleCount = 0;
+            
+            const breathingOverlay = document.createElement('div');
+            breathingOverlay.className = 'paused-overlay';
+            breathingOverlay.innerHTML = `
+                <div class="paused-content">
+                    <div class="paused-title">🫁</div>
+                    <div class="paused-subtitle">4-7-8 Breathing</div>
+                    
+                    <div style="margin: 30px 0;">
+                        <div id="breathing-instruction" style="font-size: 1.5em; font-weight: bold; color: #10b981; margin-bottom: 20px; min-height: 60px; display: flex; align-items: center; justify-content: center;">
+                            Ready to begin?
+                        </div>
+                        <div id="breathing-visual" style="width: 120px; height: 120px; border: 3px solid #10b981; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                            <div style="font-size: 2em;">🫁</div>
+                        </div>
+                        <div id="breathing-counter" style="color: #9ca3af; font-size: 1em;">
+                            Cycle 0 of ${breathingSession.targetCycles}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="resume-btn" onclick="startBreathingCycles()" id="start-breathing-btn" style="background: #059669;">Start Breathing</button>
+                        <button class="resume-btn" onclick="skipBreathing()" style="background: #6b7280;">Skip</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add click outside and ESC to go back to break menu
+            breathingOverlay.addEventListener('click', (e) => {
+                if (e.target === breathingOverlay) {
+                    stopBreathing();
+                    showBreakMenu();
+                }
+            });
+            
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    stopBreathing();
+                    showBreakMenu();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+            
+            document.body.appendChild(breathingOverlay);
+            showSuggestion('🫁 4-7-8 breathing: inhale 4, hold 7, exhale 8. Great for calming ADHD minds!', 'energy');
+        }
+
+        function startBreathingCycles() {
+            const startBtn = document.getElementById('start-breathing-btn');
+            if (startBtn) startBtn.style.display = 'none';
+            
+            breathingSession.cycleCount = 0;
+            nextBreathingPhase();
+        }
+
+        function nextBreathingPhase() {
+            const instruction = document.getElementById('breathing-instruction');
+            const visual = document.getElementById('breathing-visual');
+            const counter = document.getElementById('breathing-counter');
+            
+            if (!instruction || !breathingSession.active) return;
+            
+            // Clear any existing timer
+            if (breathingSession.phaseTimer) {
+                clearTimeout(breathingSession.phaseTimer);
+            }
+            
+            switch(breathingSession.phase) {
+                case 'ready':
+                    breathingSession.phase = 'inhale';
+                    breathingSession.phaseDuration = 4000; // 4 seconds
+                    instruction.textContent = 'Breathe in slowly through your nose...';
+                    visual.style.transform = 'scale(1.3)';
+                    visual.style.borderColor = '#3b82f6';
+                    break;
+                    
+                case 'inhale':
+                    breathingSession.phase = 'hold';
+                    breathingSession.phaseDuration = 7000; // 7 seconds
+                    instruction.textContent = 'Hold your breath...';
+                    visual.style.transform = 'scale(1.3)';
+                    visual.style.borderColor = '#f59e0b';
+                    break;
+                    
+                case 'hold':
+                    breathingSession.phase = 'exhale';
+                    breathingSession.phaseDuration = 8000; // 8 seconds
+                    instruction.textContent = 'Exhale slowly through your mouth...';
+                    visual.style.transform = 'scale(1)';
+                    visual.style.borderColor = '#ef4444';
+                    break;
+                    
+                case 'exhale':
+                    breathingSession.cycleCount++;
+                    counter.textContent = `Cycle ${breathingSession.cycleCount} of ${breathingSession.targetCycles}`;
+                    
+                    if (breathingSession.cycleCount >= breathingSession.targetCycles) {
+                        finishBreathing();
+                        return;
+                    }
+                    
+                    breathingSession.phase = 'pause';
+                    breathingSession.phaseDuration = 2000; // 2 second pause
+                    instruction.textContent = 'Pause...';
+                    visual.style.transform = 'scale(1.1)';
+                    visual.style.borderColor = '#10b981';
+                    break;
+                    
+                case 'pause':
+                    breathingSession.phase = 'inhale';
+                    breathingSession.phaseDuration = 4000;
+                    instruction.textContent = 'Breathe in slowly through your nose...';
+                    visual.style.transform = 'scale(1.3)';
+                    visual.style.borderColor = '#3b82f6';
+                    break;
+            }
+            
+            // Schedule next phase
+            breathingSession.phaseTimer = setTimeout(nextBreathingPhase, breathingSession.phaseDuration);
+        }
+
+        function finishBreathing() {
+            stopBreathing();
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            playCompletionSound();
+            showSuggestion('🧘‍♂️ Breathing complete! Feeling more centered and ready to focus?', 'focus');
+            
+            setTimeout(() => {
+                startTimer();
+            }, 2000);
+        }
+
+        function skipBreathing() {
+            stopBreathing();
+            const overlay = document.querySelector('.paused-overlay');
+            if (overlay) overlay.remove();
+            
+            showSuggestion('🌬️ No worries! Back to focused work when you\'re ready.', 'focus');
+            startTimer();
+        }
+
+        function stopBreathing() {
+            breathingSession.active = false;
+            if (breathingSession.phaseTimer) {
+                clearTimeout(breathingSession.phaseTimer);
+                breathingSession.phaseTimer = null;
+            }
+        }
+
+        function switchTask() {
+            const confirmSwitch = confirm('⚠️ ADHD Alert: Switching tasks frequently can reduce productivity. Are you sure?');
+            if (confirmSwitch) {
+                exitFocusMode();
+                showSuggestion('🔄 Task switched. Try to minimize context switching for better focus.', 'hyperfocus');
+            }
+        }
+
+        function exitFocusMode() {
+            clearInterval(focusSession.timerId);
+            focusSession.active = false;
+            
+            document.getElementById('dashboard-view').style.display = 'block';
+            document.getElementById('focus-mode').classList.remove('active');
+            
+            renderTasks();
+            updateSuggestions();
+        }
+
+        // Smart suggestions system
+        function updateSuggestions() {
+            const suggestions = [];
+            
+            // Energy-based suggestions
+            if (focusSession.energy < 30) {
+                suggestions.push({
+                    text: '💡 Low energy detected. Consider a quick walk or healthy snack before continuing.',
+                    type: 'energy'
+                });
+            }
+            
+            // Focus list suggestions
+            if (currentTasks.focus.length === 0) {
+                suggestions.push({
+                    text: '🎯 Your Focus List is empty. Drag 1-3 high-priority tasks to get started.',
+                    type: 'focus'
+                });
+            } else if (currentTasks.focus.length > 2) {
+                suggestions.push({
+                    text: '⚡ You have 3 focus tasks. Consider completing one before adding more to prevent overwhelm.',
+                    type: 'context'
+                });
+            }
+            
+            // Hyperfocus warnings
+            const hyperfocusTasks = currentTasks.focus.filter(t => t.hyperfocus);
+            if (hyperfocusTasks.length > 0) {
+                suggestions.push({
+                    text: `🚨 Hyperfocus Alert: "${hyperfocusTasks[0].title}" may consume more time than expected. Set a timer!`,
+                    type: 'hyperfocus'
+                });
+            }
+            
+            // Time-based suggestions
+            const highEnergyTasks = currentTasks.focus.filter(t => t.energy === 'high');
+            if (highEnergyTasks.length > 0 && focusSession.energy > 60) {
+                suggestions.push({
+                    text: `⚡ High energy detected! Perfect time to tackle "${highEnergyTasks[0].title}".`,
+                    type: 'focus'
+                });
+            }
+            
+            renderSuggestions(suggestions);
+        }
+
+        function renderSuggestions(suggestions) {
+            const container = document.getElementById('suggestion-list');
+            container.innerHTML = '';
+            
+            suggestions.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.className = `suggestion ${suggestion.type}`;
+                div.innerHTML = `<strong>${suggestion.text}</strong>`;
+                container.appendChild(div);
+            });
+        }
+
+        function showSuggestion(text, type) {
+            renderSuggestions([{ text, type }]);
+            setTimeout(() => updateSuggestions(), 5000);
+        }
+
+        // Start the app
+        init();
+    </script>
+
+    <!-- Keyboard Shortcuts Legend -->
+    <div class="shortcuts-legend">
+        <h4>⌨️ Shortcuts</h4>
+        <div class="shortcut-item">
+            <span class="shortcut-key">+</span>
+            <span class="shortcut-desc">Add task</span>
+        </div>
+        <div class="shortcut-item">
+            <span class="shortcut-key">Enter</span>
+            <span class="shortcut-desc">Start focus</span>
+        </div>
+        <div class="shortcut-item">
+            <span class="shortcut-key">Esc</span>
+            <span class="shortcut-desc">Exit focus</span>
+        </div>
+    </div>
+</body>
+</html>

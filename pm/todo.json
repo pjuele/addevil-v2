@@ -1,0 +1,203 @@
+{
+  "todos": [
+    {
+      "id": 2,
+      "task": "Consider adding task creation functionality to prototype",
+      "status": "completed", 
+      "priority": "medium",
+      "createdAt": "2025-08-23T16:30:00Z",
+      "description": "Fully implemented task creation system: + button in Long List header with Lucide icon, keyboard shortcut (+), inline text input with brain-dump mode (Enter saves and keeps input open), ESC/click-outside to close, ADHD-friendly defaults (priority=now, energy=medium, duration=30min), priority-based sorting (now → later → parking), drag-drop completion with sound/animation, and expanded drag-drop target areas (entire column clickable)."
+    },
+    {
+      "id": 3,
+      "task": "Explore additional ADHD-friendly features based on user feedback",
+      "status": "pending",
+      "priority": "low", 
+      "createdAt": "2025-08-23T16:30:00Z",
+      "description": "Research and implement more ADHD-specific features as requested"
+    },
+    {
+      "id": 5,
+      "task": "Build todo visualization with priority sorting",
+      "status": "completed",
+      "priority": "high",
+      "createdAt": "2025-08-23T16:30:00Z",
+      "description": "Create a visual interface to display and manage project todos, sorted by priority"
+    },
+    {
+      "id": 6,
+      "task": "What happens when clicking on an item?",
+      "status": "completed",
+      "priority": "medium",
+      "createdAt": "2025-08-23T17:00:00Z",
+      "description": "Define and implement click behavior for prototype tasks - implemented full task edit form with auto-save behavior"
+    },
+    {
+      "id": 7,
+      "task": "Understand routines & habits - what does it do?",
+      "status": "pending",
+      "priority": "medium",
+      "createdAt": "2025-08-23T17:00:00Z",
+      "description": "Clarify the purpose and functionality of the routines section"
+    },
+    {
+      "id": 8,
+      "task": "Add tasteful label to 3/3 focus tasks reached - red number not visible enough",
+      "status": "completed",
+      "priority": "high",
+      "createdAt": "2025-08-23T17:00:00Z",
+      "description": "Improve visual feedback when focus list limit is reached"
+    },
+    {
+      "id": 9,
+      "task": "Tasteful popup when trying to drag 4th focus item?",
+      "status": "completed",
+      "priority": "medium",
+      "createdAt": "2025-08-23T17:00:00Z",
+      "description": "Better UX feedback when attempting to exceed focus list limit - implemented with failure sound + red flash"
+    },
+    {
+      "id": 10,
+      "task": "Switch task in focus mode does nothing (useful)",
+      "status": "pending",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:00:00Z",
+      "description": "Implement actual task switching functionality in focus mode"
+    },
+    {
+      "id": 11,
+      "task": "Responsive mode (mobile sizes not covered properly)",
+      "status": "completed",
+      "priority": "high",
+      "createdAt": "2025-08-23T17:00:00Z",
+      "description": "Make prototype work well on mobile and tablet screen sizes"
+    },
+    {
+      "id": 12,
+      "task": "Add task persistence with localStorage",
+      "status": "completed",
+      "priority": "medium",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Save tasks between sessions using browser localStorage"
+    },
+    {
+      "id": 13,
+      "task": "Implement task editing functionality",
+      "status": "completed",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Already implemented - clicking any task opens comprehensive edit form with title, duration (15min-Half day), energy (low/medium/high), and priority (now/later/parking) selection with auto-save functionality. Desktop always edits, mobile edits except for long→focus quick-add behavior."
+    },
+    {
+      "id": 14,
+      "task": "Add subtask breakdown feature",
+      "status": "pending",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Break complex tasks into smaller, manageable steps"
+    },
+    {
+      "id": 15,
+      "task": "Implement time tracking functionality",
+      "status": "pending",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Record actual vs estimated time for ADHD learning/calibration"
+    },
+    {
+      "id": 16,
+      "task": "Add daily reset feature",
+      "status": "pending",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Clear completed tasks each day with option to archive"
+    },
+    {
+      "id": 17,
+      "task": "Implement routine triggers system",
+      "status": "pending",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Automatic task suggestions based on time/context triggers"
+    },
+    {
+      "id": 18,
+      "task": "Add export/import functionality",
+      "status": "pending",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Share task lists or backup data as JSON/CSV"
+    },
+    {
+      "id": 19,
+      "task": "Add completion sound effects",
+      "status": "completed",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Dopamine-boosting audio feedback for task completion"
+    },
+    {
+      "id": 20,
+      "task": "Implement keyboard shortcuts",
+      "status": "pending",
+      "priority": "low",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Essential ADHD-friendly shortcuts: Space (complete focused task), Tab (switch between focus tasks), Delete/Backspace (remove focused task), Shift+Enter (add task and close input), Ctrl/Cmd+L (quick focus Long List input), 1/2/3 (jump to focus task 1/2/3), Escape (clear focus/return to overview). Focus on solving real friction points vs cognitive overhead."
+    },
+    {
+      "id": 21,
+      "task": "Add smooth completion animations",
+      "status": "completed",
+      "priority": "high",
+      "createdAt": "2025-08-23T17:05:00Z",
+      "description": "Visual feedback animations for completed tasks"
+    },
+    {
+      "id": 22,
+      "task": "What does break button do? Brainstorm ideas",
+      "status": "completed",
+      "priority": "medium",
+      "createdAt": "2025-08-23T17:10:00Z",
+      "description": "Implemented paused overlay with break options menu: 5-minute timer, breathing exercises (4-7-8), movement suggestions, and brain dump notepad. All options ready for individual implementation."
+    },
+    {
+      "id": 23,
+      "task": "BUG: the blue dotted frame stays on in Long List after dragging a task to Today's Focus",
+      "status": "completed",
+      "priority": "high",
+      "createdAt": "2025-08-23T17:15:00Z",
+      "description": "Fix drag-over state not clearing properly after successful drop"
+    },
+    {
+      "id": 24,
+      "task": "Add failure sound for rejected drag operations",
+      "status": "completed",
+      "priority": "medium",
+      "createdAt": "2025-08-23T18:00:00Z",
+      "description": "Descending error tone when dragging too many tasks or dropping in invalid areas"
+    },
+    {
+      "id": 25,
+      "task": "Fix page title and toolbar area",
+      "status": "completed",
+      "priority": "medium",
+      "createdAt": "2025-08-23T18:15:00Z",
+      "description": "Comprehensive header improvements: responsive flexbox layout, logo integration, Lucide icons with tooltips, sound toggle functionality, and stable layout preventing width changes from shifting elements"
+    },
+    {
+      "id": 26,
+      "task": "Add visual timer representation for ADHD focus",
+      "status": "pending",
+      "priority": "medium",
+      "createdAt": "2025-08-24T00:00:00Z",
+      "description": "Add visual countdown representation (progress ring, bar, or pie chart) to help ADHD users see remaining time at a glance, complementing the numeric timer"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-08-23T19:00:00Z",
+    "totalTodos": 23,
+    "priorities": ["high", "medium", "low"],
+    "statuses": ["pending", "in_progress", "completed"]
+  }
+}

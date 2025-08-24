@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADDevil - Project Index</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="public/favicons/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="public/favicons/favicon.svg">
+    <link rel="icon" type="image/png" sizes="96x96" href="public/favicons/favicon-96x96.png">
+    <link rel="apple-touch-icon" href="public/favicons/apple-touch-icon.png">
+    <link rel="manifest" href="public/favicons/site.webmanifest">
+    
+    <style>
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            margin: 0;
+            padding: 48px 24px;
+            background: #09090b;
+            color: #E5E5E5;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #181818;
+            border: 1px solid #252525;
+            border-radius: 12px;
+            padding: 48px;
+            text-align: center;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+        }
+
+        .title-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .main-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #E5E5E5;
+            line-height: 1;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+        }
+
+        .description {
+            color: #9ca3af;
+            margin-bottom: 48px;
+            font-size: 1.1rem;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        @media (min-width: 640px) {
+            .nav-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        .nav-card {
+            background: #252525;
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 24px;
+            text-decoration: none;
+            color: #E5E5E5;
+            transition: all 0.2s ease;
+            display: block;
+        }
+
+        .nav-card:hover {
+            background: #404040;
+            border-color: #404040;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .nav-description {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid #252525;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .server-info {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 32px;
+            color: #10b981;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="public/images/devil.png" alt="ADDevil Logo" class="logo">
+            <div class="title-text">
+                <span class="main-title">ADDevil</span>
+                <span class="subtitle">ADHD Todo System</span>
+            </div>
+        </div>
+
+        <div class="server-info">
+            ✅ Server running at http://localhost:8000
+        </div>
+
+        <p class="description">
+            An ADHD-friendly todo system prototype implementing evidence-based strategies for managing tasks without overwhelm.
+        </p>
+
+        <div class="nav-grid">
+            <a href="prototype/prototype.html" target="_blank" class="nav-card">
+                <span class="nav-icon">🎯</span>
+                <div class="nav-title">Prototype</div>
+                <div class="nav-description">Interactive ADHD todo system with three-list management and focus mode</div>
+            </a>
+
+            <a href="analysis/wireframes.html" target="_blank" class="nav-card">
+                <span class="nav-icon">📋</span>
+                <div class="nav-title">Analysis</div>
+                <div class="nav-description">Design wireframes and ADHD research-based system specifications</div>
+            </a>
+
+            <a href="pm/todos.html" target="_blank" class="nav-card">
+                <span class="nav-icon">📊</span>
+                <div class="nav-title">Project Management</div>
+                <div class="nav-description">Development backlog and completed feature tracking</div>
+            </a>
+        </div>
+
+        <div class="footer">
+            <strong>ADDevil</strong> - Because sometimes you need a little devil on your shoulder to keep you focused 😈
+        </div>
+    </div>
+</body>
+</html>

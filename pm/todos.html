@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADDevil Project Todos</title>
+    <style>
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #09090b;
+            color: #E5E5E5;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .active-column,
+        .completed-column {
+            min-height: 400px;
+        }
+
+        .column-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #181818;
+            border: 1px solid #252525;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        h1 {
+            color: #E5E5E5;
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .stats {
+            background: #181818;
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            text-align: center;
+        }
+
+        .stat {
+            background: #252525;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .priority-section {
+            margin-bottom: 32px;
+        }
+
+        .priority-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .priority-high .priority-badge {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .priority-medium .priority-badge {
+            background: #eab308;
+            color: #000000;
+        }
+
+        .priority-low .priority-badge {
+            background: #6b7280;
+            color: #ffffff;
+        }
+
+        .todo-item {
+            background: #181818;
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.15s ease;
+        }
+
+        .todo-item:hover {
+            background: #252525;
+            border-color: #404040;
+        }
+
+        .todo-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .todo-status {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .status-pending {
+            background: #404040;
+            color: #E5E5E5;
+        }
+
+        .status-in_progress {
+            background: #3b82f6;
+            color: #ffffff;
+        }
+
+        .status-completed {
+            background: #10b981;
+            color: #ffffff;
+        }
+
+        .todo-title {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .todo-id {
+            position: absolute;
+            top: -4px;
+            right: 0;
+            background: #404040;
+            color: #E5E5E5;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .todo-description {
+            color: #9ca3af;
+            font-size: 0.875rem;
+            margin-left: 92px;
+        }
+
+        .todo-meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+            margin-left: 92px;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .todo-item.priority-high {
+            border-left: 2px solid #ef4444;
+        }
+
+        .todo-item.priority-medium {
+            border-left: 2px solid #eab308;
+        }
+
+        .todo-item.priority-low {
+            border-left: 2px solid #6b7280;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+            margin: 32px 0;
+        }
+
+        .todo-completed {
+            opacity: 0.6;
+        }
+
+        .todo-completed .todo-title {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        .todo-completed .todo-description {
+            color: #6b7280;
+        }
+
+        .todo-completed .todo-meta {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 ADDevil Project Todos</h1>
+        
+        <div class="stats" id="stats">
+            <!-- Stats will be populated by JavaScript -->
+        </div>
+
+        <div class="main-layout">
+            <div class="active-column">
+                <div class="column-header">📋 Active Tasks</div>
+                <div id="active-todos-container">
+                    <!-- Active todos will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="completed-column">
+                <div class="column-header">✅ Completed Tasks</div>
+                <div id="completed-todos-container">
+                    <!-- Completed todos will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let todos = [];
+
+        // Load todos from JSON file
+        async function loadTodos() {
+            try {
+                const response = await fetch('todo.json');
+                const data = await response.json();
+                todos = data.todos;
+                renderStats(data.metadata);
+                renderTodos();
+            } catch (error) {
+                console.error('Error loading todos:', error);
+                document.getElementById('todos-container').innerHTML = 
+                    '<div class="empty-state">Error loading todos. Make sure todo.json exists.</div>';
+            }
+        }
+
+        // Render statistics
+        function renderStats(metadata) {
+            const statsContainer = document.getElementById('stats');
+            
+            const statusCounts = {
+                pending: todos.filter(t => t.status === 'pending').length,
+                in_progress: todos.filter(t => t.status === 'in_progress').length,
+                completed: todos.filter(t => t.status === 'completed').length
+            };
+
+            const activeTasks = todos.filter(t => t.status !== 'completed').length;
+
+            const priorityCounts = {
+                high: todos.filter(t => t.priority === 'high').length,
+                medium: todos.filter(t => t.priority === 'medium').length,
+                low: todos.filter(t => t.priority === 'low').length
+            };
+
+            statsContainer.innerHTML = `
+                <div class="stat">
+                    <div class="stat-number">${metadata.totalTodos}</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">${activeTasks}</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">${statusCounts.completed}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">${statusCounts.in_progress}</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">${priorityCounts.high}</div>
+                    <div class="stat-label">High Priority</div>
+                </div>
+            `;
+        }
+
+        // Render todos sorted by priority and split by completion status
+        function renderTodos() {
+            const activeContainer = document.getElementById('active-todos-container');
+            const completedContainer = document.getElementById('completed-todos-container');
+            
+            // Split todos by completion status
+            const activeTodos = todos.filter(t => t.status !== 'completed');
+            const completedTodos = todos.filter(t => t.status === 'completed');
+            
+            // Render active todos
+            activeContainer.innerHTML = renderTodosByStatus(activeTodos, 'active');
+            
+            // Render completed todos
+            completedContainer.innerHTML = renderTodosByStatus(completedTodos, 'completed');
+        }
+
+        // Helper function to render todos by status
+        function renderTodosByStatus(todoList, statusType) {
+            if (todoList.length === 0) {
+                const emptyMessage = statusType === 'active' ? 'No active tasks.' : 'No completed tasks yet.';
+                return `<div class="empty-state">${emptyMessage}</div>`;
+            }
+
+            // Sort by priority (high, medium, low) and then by status
+            const priorities = ['high', 'medium', 'low'];
+            const sortedTodos = priorities.reduce((acc, priority) => {
+                const todosForPriority = todoList.filter(t => t.priority === priority);
+                if (todosForPriority.length > 0) {
+                    acc[priority] = todosForPriority.sort((a, b) => {
+                        const statusOrder = { 'in_progress': 0, 'pending': 1, 'completed': 2 };
+                        return statusOrder[a.status] - statusOrder[b.status];
+                    });
+                }
+                return acc;
+            }, {});
+
+            let html = '';
+
+            Object.entries(sortedTodos).forEach(([priority, priorityTodos]) => {
+                const priorityCount = priorityTodos.length;
+                html += `
+                    <div class="priority-section priority-${priority}">
+                        <div class="priority-header">
+                            <span>${priority.charAt(0).toUpperCase() + priority.slice(1)} Priority</span>
+                            <span class="priority-badge">${priorityCount} ${priorityCount === 1 ? 'task' : 'tasks'}</span>
+                        </div>
+                        ${priorityTodos.map(todo => renderTodoItem(todo)).join('')}
+                    </div>
+                `;
+            });
+
+            return html;
+        }
+
+        // Render individual todo item
+        function renderTodoItem(todo) {
+            const createdDate = new Date(todo.createdAt).toLocaleDateString();
+            const statusClass = `status-${todo.status.replace(' ', '_')}`;
+            const priorityClass = `priority-${todo.priority}`;
+            const completedClass = todo.status === 'completed' ? 'todo-completed' : '';
+
+            return `
+                <div class="todo-item ${priorityClass} ${completedClass}">
+                    <div class="todo-header">
+                        <span class="todo-status ${statusClass}">${formatStatus(todo.status)}</span>
+                        <span class="todo-title">${todo.task}</span>
+                        <span class="todo-id">${todo.id}</span>
+                    </div>
+                    ${todo.description ? `<div class="todo-description">${todo.description}</div>` : ''}
+                    <div class="todo-meta">
+                        <span>Created: ${createdDate}</span>
+                        <span>Priority: ${todo.priority}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Format status for display
+        function formatStatus(status) {
+            return status.replace('_', ' ').split(' ').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        // Initialize the app
+        loadTodos();
+        
+        // Auto-refresh every 10 seconds (10000ms)
+        setInterval(() => {
+            console.log('Auto-refreshing project todos...');
+            
+            // Flash indicator
+            const indicator = document.createElement('div');
+            indicator.textContent = '🔄 Refreshed';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #3b82f6;
+                color: white;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+            document.body.appendChild(indicator);
+            
+            // Animate in
+            requestAnimationFrame(() => {
+                indicator.style.opacity = '1';
+            });
+            
+            // Remove after 2 seconds
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                setTimeout(() => {
+                    if (indicator.parentNode) {
+                        indicator.parentNode.removeChild(indicator);
+                    }
+                }, 300);
+            }, 2000);
+            
+            loadTodos();
+        }, 10000);
+    </script>
+</body>
+</html>
