@@ -21,11 +21,11 @@ def main():
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
             print(f"🚀 ADDevil server running at http://localhost:{PORT}")
             print(f"📁 Serving files from: {os.getcwd()}")
-            print(f"🎯 Open wireframes at: http://localhost:{PORT}/wireframes.html")
+            print(f"🎯 Open project at: http://localhost:{PORT}")
             print("Press Ctrl+C to stop")
             
             # Auto-open browser
-            webbrowser.open(f'http://localhost:{PORT}/wireframes.html')
+            webbrowser.open(f'http://localhost:{PORT}')
             
             httpd.serve_forever()
             
